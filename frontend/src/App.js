@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
-import "./App.css";
+import "./assets/styles/App.css";
 
 function App() {
   const [posts, setPosts] = useState([]);

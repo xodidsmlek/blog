@@ -5,7 +5,9 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://xodidsmlek.github.io' // 또는 '*'로 모든 도메인 허용
+}));
 
 const POSTS_DIR = path.join(__dirname, 'posts');
 

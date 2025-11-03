@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Sidebar.css";
+import "../assets/styles/Sidebar.css";
 
 function Sidebar({ posts }) {
   const [openMenu, setOpenMenu] = useState(null);

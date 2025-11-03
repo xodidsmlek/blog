@@ -1,0 +1,27 @@
+.post-card {
+  background-color: #fffaf5; /* 메인 콘텐츠와 톤 통일 */
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.post-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #3b2e2a;
+}
+
+.post-summary {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}

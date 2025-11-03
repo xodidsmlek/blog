@@ -15,7 +15,7 @@ function Sidebar({ posts }) {
           className={`menu-item ${openMenu === "posts" ? "open" : ""}`}
           onClick={() => toggleMenu("posts")}
         >
-          📚 Posts
+          Posts
         </div>
         {openMenu === "posts" && (
           <div className="submenu">
@@ -31,7 +31,7 @@ function Sidebar({ posts }) {
           className={`menu-item ${openMenu === "record" ? "open" : ""}`}
           onClick={() => toggleMenu("record")}
         >
-          🗂️ Record
+          Record
         </div>
       </div>
     </aside>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../assets/styles/Sidebar.css";
 
-function Sidebar({ posts }) {
+function Sidebar({ posts, onSelectPost }) {
   const [openMenu, setOpenMenu] = useState(null);
 
   const toggleMenu = (menu) => {

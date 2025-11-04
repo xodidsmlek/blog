@@ -1,6 +1,6 @@
 import React from "react";
 import { marked } from "marked";
-import "./PostCard.css";
+import "../assets/styles/PostCard.css";
 
 function PostCard({ post }) {
   // markdown → HTML 변환

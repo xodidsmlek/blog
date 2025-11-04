@@ -62,4 +62,7 @@
 /* 내용이 많을 때 자연스러운 스크롤 */
 body {
   overflow-y: auto;
-  backgrou
+  background-color: #fdfbf7;
+  margin: 0;
+  font-family: "Noto Sans KR", sans-serif;
+}

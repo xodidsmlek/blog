@@ -1,11 +1,18 @@
 import React from "react";
-import "../assets/styles/PostCard.css";
+import { marked } from "marked";
+import "./PostCard.css";
 
 function PostCard({ post }) {
+  // markdown → HTML 변환
+  const htmlContent = marked(post.content || "");
+
   return (
     <div className="post-card">
       <h2 className="post-title">{post.title}</h2>
-      <p className="post-summary">{post.summary || "요약 내용이 없습니다."}</p>
+      <div
+        className="post-content"
+        dangerouslySetInnerHTML={{ __html: htmlContent }}
+      />
     </div>
   );
 }

@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { marked } from "marked";
 import "../assets/styles/PostCard.css";
 
 function PostCard({ post }) {
-  // markdown → HTML 변환
   const htmlContent = marked(post.content || "");
+
+  // 포스트 열릴 때 상단으로 자동 스크롤
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [post]);
 
   return (
     <div className="post-card">

@@ -6,7 +6,8 @@ const path = require('path');
 
 const app = express();
 app.use(cors({
-  origin: ['https://xodidsmlek.github.io','http://192.168.0.116:3000/blog'] // 또는 '*'로 모든 도메인 허용
+  origin: ['https://xodidsmlek.github.io','http://192.168.0.116:3000/blog'],
+  methods: ['GET', 'POST']
 }));
 
 const POSTS_DIR = path.join(__dirname, 'posts');

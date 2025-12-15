@@ -8,7 +8,7 @@ function App() {
   useEffect(() => {
     fetch("https://blog-nvf1.onrender.com/posts")
       .then((res) => res.json())
-      .then(data => setPosts(data));
+      .then(setPosts);
   }, []);
 
   return (
@@ -17,6 +17,7 @@ function App() {
         {posts.map(post => (
           <li>{post}</li>
         ))}
+        
       </aside>
 
       <main className="main-content">

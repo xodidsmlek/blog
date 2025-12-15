@@ -1,24 +1,32 @@
 .app-container {
   display: flex;
   height: 100vh;
-}
-
-.main-content {
-  flex: 1;
-  background-color: #ffffff;
-  padding: 30px;
-  color: #333;
-}
-
-.app-container {
-  display: flex;
-  height: 100vh;
   background-color: #f0ece5; /* 전체 화면 포근한 배경톤 */
   padding: 20px; /* 화면 가장자리 여백 */
   box-sizing: border-box;
 }
 
-/* 사이드바는 그대로 유지 */
+/* 메인 콘텐츠 */
+.main-content {
+  flex: 1;
+  background-color: #fffaf5; /* 포근한 베이지/아이보리톤 */
+  padding: 30px;
+  border-radius: 16px; /* 뭉툭하게 둥글게 */
+  margin-left: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* 살짝 그림자 */
+  color: #333;
+
+  transition: 
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.main-content:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* 사이드바 */
 .sidebar {
   width: 220px;
   background-color: #f8f5f0;
@@ -28,22 +36,14 @@
   padding: 20px;
   box-sizing: border-box;
   font-family: "Noto Sans KR", sans-serif;
+
+  transition: 
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-/* 메인 콘텐츠 영역 중앙 감싸는 백그라운드 */
-.main-content {
-  flex: 1;
-  background-color: #fffaf5; /* 포근한 베이지/아이보리톤 */
-  padding: 30px;
-  border-radius: 16px; /* 뭉툭하게 둥글게 */
-  margin-left: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* 살짝 그림자 */
-  color: #333;
+.sidebar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
-.posts-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px; /* 카드 사이 간격 */
-  margin-top: 20px;
-}

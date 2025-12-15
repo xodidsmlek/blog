@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "./components/Sidebar";
-import PostCard from "./components/PostCard";
 import "./assets/styles/App.css";
 
 function App() {
@@ -10,26 +8,20 @@ function App() {
   useEffect(() => {
     fetch("https://blog-nvf1.onrender.com/posts")
       .then((res) => res.json())
-      .then(setPosts);
+      .then(data => setPosts(data));
   }, []);
 
   return (
     <div className="app-container">
-      <Sidebar posts={posts} onSelectPost={setSelectedPost} />
+      <aside className="sidebar">
+        {posts.map(post => (
+          <li>{post}</li>
+        ))}
+      </aside>
+
       <main className="main-content">
-		{!selectedPost ? (
-          <>
-            <h1>Welcome to My Blog</h1>
-            <div className="posts-container">
-				{posts.map((post) => (
-					<PostCard key={post.id} post={post} onSelectPost={setSelectedPost} />
-				))}
-			</div>
-          </>
-        ) : (
-          <PostCard post={selectedPost} />
-        )}
-      </main>
+        
+		  </main>
     </div>
   );
 }

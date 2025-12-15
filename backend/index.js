@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 app.use(cors({
-  origin: ['https://xodidsmlek.github.io','http://192.168.0.116:3000'],
+  origin: ['https://xodidsmlek.github.io','http://localhost:3000'],
   methods: ['GET', 'POST']
 }));
 

@@ -13,6 +13,7 @@ const POSTS_DIR = path.join(__dirname, 'posts');
 
 // 모든 게시글 목록 가져오기
 app.get('/posts', async (req, res) => {
+  console.log("Received request for /posts");
   try {
     const files = await fs.readdir(POSTS_DIR);
     const posts = await Promise.all(

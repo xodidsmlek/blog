@@ -1,10 +1,12 @@
 const express = require('express');
-const fs = require('fs-extra');
-const matter = require('gray-matter');
 const cors = require('cors');
 const path = require('path');
+const db = require('./db');
 
 const app = express();
+
+app.use(express.json());           // ⭐ 필수
+app.use(express.urlencoded({ extended: true })); // 선
 app.use(cors({
   origin: ['https://xodidsmlek.github.io','http://localhost:3000'],
   methods: ['GET', 'POST']
@@ -12,38 +14,72 @@ app.use(cors({
 
 const POSTS_DIR = path.join(__dirname, 'posts');
 
-// 모든 게시글 목록 가져오기
-app.get('/posts', async (req, res) => {
-  console.log("Received request for /posts");
-  try {
-    const files = await fs.readdir(POSTS_DIR);
-    const posts = await Promise.all(
-      files.map(async (file) => {
-        const content = await fs.readFile(path.join(POSTS_DIR, file), 'utf-8');
-        const { data } = matter(content);
-        return { ...data, slug: file.replace('.md', '') };
-      })
-    );
-    res.json(posts);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error reading posts');
-  }
+// 팀리스트 전체 조회
+app.get('/team_list', async (req, res) => {
+  console.log("Received request for /team_list");
+  
+  const result = db.prepare(
+    'SELECT id, f_nm, l_nm, team FROM team_user WHERE use_yn = \'Y\' ORDER BY team DESC'
+  ).all();
+
+  res.json(result);
 });
 
-// 특정 게시글 내용 가져오기
-app.get('/posts/:slug', async (req, res) => {
-  const slug = req.params.slug;
-  try {
-    const filePath = path.join(POSTS_DIR, `${slug}.md`);
-    const content = await fs.readFile(filePath, 'utf-8');
-    const { data, content: body } = matter(content);
-    res.json({ ...data, content: body });
-  } catch (err) {
-    console.error(err);
-    res.status(404).send('Post not found');
-  }
+// 팀명리스트 전체 조회
+app.get('/team_nm_list', async (req, res) => {
+  console.log("Received request for /team_list");
+  
+  const result = db.prepare(
+    'SELECT DISTINCT team FROM team_user WHERE use_yn = \'Y\' ORDER BY id'
+  ).all();
+
+  res.json(result);
 });
+
+// 특정 팀리스트 조회
+app.post('/detail_team_list', async (req, res) => {
+  console.log("Received request for /detail_team_list");
+  const {team } = req.body;
+  
+  const result = db.prepare(
+    'SELECT id, f_nm, l_nm, team FROM team_user WHERE use_yn = \'Y\' AND team = ? ORDER BY team DESC'
+  ).all(team);
+  res.json(result);
+});
+
+// 등록
+app.post('/teamInsert', (req, res) => {
+  const { f_nm, l_nm, team } = req.body;
+
+  const result = db.prepare(
+    'INSERT INTO team_user (f_nm, l_nm, team) VALUES (?, ?, ?)'
+  ).run(f_nm, l_nm, team);
+
+  res.json();
+});
+
+// 수정
+app.post('/teamUpdate', (req, res) => {
+  const { id, f_nm, l_nm, team } = req.body;
+
+  const result = db.prepare(
+    'UPDATE team_user SET f_nm = ?, l_nm = ?, team = ? WHERE id = ?'
+  ).run(f_nm, l_nm, team, id);
+
+  res.json();
+});
+
+// 삭제
+app.post('/teamDelete', (req, res) => {
+  const { id } = req.body;
+
+  const result = db.prepare(
+    'DELETE FROM team_user WHERE id = ?'
+  ).run(id);
+
+  res.json();
+});
+
 
 app.listen(4000, () => {
   console.log('✅ Server running on http://localhost:4000');

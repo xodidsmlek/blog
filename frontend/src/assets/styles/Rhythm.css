@@ -1,0 +1,74 @@
+.round{
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    padding-right: 22%;
+/* 
+    display: none; */
+}
+
+.deck {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 80%;
+
+    float: left;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    width :80%;
+    aspect-ratio: 1 / 1.2; /* 가로 : 세로 = 1:1 */
+    border : 4px solid #333;
+
+    /* display: none; */
+}
+
+.card-image img{
+    width: 80%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.card-name {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.team-list {
+    float: right;
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 16px;
+}
+
+.team {
+    background: #fff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    height: 20px;
+    border : 3px solid #333;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+    font-weight: bold;
+}
+
+.team:hover {
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.team.selected {
+    background: #ddd;
+}
+.team.selected:hover {
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.4);
+}

@@ -9,7 +9,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    width: 100%;
+    width: 60%;
 
 }
 
@@ -18,7 +18,7 @@
     text-align: center;
     border-radius: 8px;
     width :100%;
-    aspect-ratio: 1 / 1.2; /* 가로 : 세로 = 1:1 */
+    aspect-ratio: 1 / 1; /* 가로 : 세로 = 1:1 */
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
     opacity: 0;
     transform: scale(0.7);
@@ -51,9 +51,17 @@
     gap: 16px;
 }
 
+.level-list {
+    margin-top: 40px;
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
 .team, .level {
     background: #eee;
-    padding: 20px;
+    padding: 20px; 
     text-align: center;
     border-radius: 8px;
     height: 20px;
@@ -65,11 +73,14 @@
 }
 
 .team:hover, .level:hover {
+    background: #aaa;
     box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .team.selected, .card.selected, .level.selected{
-    background: #ccc;
+    background: black;
+    opacity: 0.7;
+    color: white;
 }
 .team.selected:hover, .card.selected:hover, .level.selected:hover {
     box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4);

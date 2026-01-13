@@ -1,4 +1,5 @@
 import {useState,useRef, useEffect, use} from "react";
+import rhythmBgm from "../../../public/bgm/rhythm.mp3"
 import "../../assets/styles/Rhythm.css";
 
 function Rhythm() {
@@ -137,21 +138,18 @@ function Rhythm() {
         // fetch("http://localhost:4000/team_list")
         .then((res) => res.json())
         .then(data => {
-            console.log("조원 목록:", data);
             const grouped = data.reduce((acc, cur) => {
                 if (!acc[cur.team]) acc[cur.team] = [];
                 acc[cur.team].push(cur);
                 return acc;
             }, {});
             setTeamMembers(grouped);
-            console.log("개편한 조원 목록:", {teamMembers});
         });
 
         fetch("https://blog-nvf1.onrender.com/team_nm_list")
         // fetch("http://localhost:4000/team_nm_list")
         .then((res) => res.json())
         .then(data => {
-            console.log("팀명 목록:", data);
             setTeamNames(data);
         });
     }, []);
@@ -178,7 +176,7 @@ function Rhythm() {
 
     return (
     <div>
-        <div className={`round ${activeCnt > 0 ? "action" : ""}`}>{roundRef.current}/5</div>
+        <div className={`round`}>{roundRef.current}/5</div>
         <div className="deck">
             <div className={`card ${activeCnt > 0 ? "action" : ""}`}><div className="card-name">{cards[0]}</div></div>
             <div className={`card ${activeCnt > 1 ? "action" : ""}`}><div className="card-name">{cards[1]}</div></div>
@@ -200,7 +198,7 @@ function Rhythm() {
             <div onClick={() => setLevel("middle")} className={`level ${level ==="middle"?"selected":""}`}>중</div>
             <div onClick={() => setLevel("low")}    className={`level ${level ==="low"?"selected":""}`}>하</div>
         </div>
-        <audio ref={audioRef} src="/blog/bgm/rhythm.mp3" />
+        <audio ref={audioRef} src={rhythmBgm} />
     </div>
     );
 }

@@ -8,8 +8,9 @@ const app = express();
 app.use(express.json());           // ⭐ 필수
 app.use(express.urlencoded({ extended: true })); // 선
 app.use(cors({
-  origin: ['https://xodidsmlek.github.io','http://localhost:3000'],
-  methods: ['GET', 'POST']
+  origin: ['https://xodidsmlek.github.io','http://localhost:5173'],
+  methods: ['GET', 'POST'],
+  credentials: true
 }));
 
 const POSTS_DIR = path.join(__dirname, 'posts');

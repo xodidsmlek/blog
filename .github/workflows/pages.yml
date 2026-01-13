@@ -1,4 +1,4 @@
-name: Deploy CRA Frontend to GitHub Pages
+name: Deploy Frontend to GitHub Pages
 
 on:
   push:
@@ -12,6 +12,10 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    environment:              # ⭐ 이 부분 추가
+      name: github-pages
+
     steps:
       - uses: actions/checkout@v4
 

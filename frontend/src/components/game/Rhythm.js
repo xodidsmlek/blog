@@ -133,8 +133,8 @@ function Rhythm() {
     }, [running]);
 
     useEffect(() => {
-        // fetch("https://blog-nvf1.onrender.com/team_list")
-        fetch("http://localhost:4000/team_list")
+        fetch("https://blog-nvf1.onrender.com/team_list")
+        // fetch("http://localhost:4000/team_list")
         .then((res) => res.json())
         .then(data => {
             console.log("조원 목록:", data);
@@ -147,7 +147,8 @@ function Rhythm() {
             console.log("개편한 조원 목록:", {teamMembers});
         });
 
-        fetch("http://localhost:4000/team_nm_list")
+        fetch("https://blog-nvf1.onrender.com/team_nm_list")
+        // fetch("http://localhost:4000/team_nm_list")
         .then((res) => res.json())
         .then(data => {
             console.log("팀명 목록:", data);

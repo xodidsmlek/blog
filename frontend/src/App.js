@@ -9,8 +9,8 @@ function App() {
 
   useEffect(() => {
     console.log("Fetching team list...");
-    // fetch("https://blog-nvf1.onrender.com/team_list")
-    fetch("http://localhost:4000/team_list")
+    fetch("https://blog-nvf1.onrender.com/team_list")
+    // fetch("http://localhost:4000/team_list")
       .then((res) => res.json())
       .then(setPosts);
   }, []);

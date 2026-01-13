@@ -9,8 +9,8 @@ function TeamUpdate() {
   function fetchTeamMembers() {
     // 조원 조회 로직 구현
     console.log("조원 조회 버튼 클릭됨");
-    // fetch("https://blog-nvf1.onrender.com/team_list")
-    fetch("http://localhost:4000/team_list")
+    fetch("https://blog-nvf1.onrender.com/team_list")
+    // fetch("http://localhost:4000/team_list")
       .then((res) => res.json())
       .then(data => {
         console.log("조원 목록:", data);
@@ -21,8 +21,8 @@ function TeamUpdate() {
     // 조원 추가 로직 구현
     console.log("조원 추가 버튼 클릭됨");
 
-    // fetch("https://blog-nvf1.onrender.com/team_list")
-    fetch("http://localhost:4000/teamInsert",{
+    fetch("https://blog-nvf1.onrender.com/teamInsert",{
+    // fetch("http://localhost:4000/teamInsert",{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,8 +39,8 @@ function TeamUpdate() {
     // 조원 추가 로직 구현
     console.log("조원 수정 버튼 클릭됨");
 
-    // fetch("https://blog-nvf1.onrender.com/team_list")
-    fetch("http://localhost:4000/teamUpdate",{
+    fetch("https://blog-nvf1.onrender.com/teamUpdate",{
+    // fetch("http://localhost:4000/teamUpdate",{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,8 +57,8 @@ function TeamUpdate() {
   function deleteTeamMember() {
     // 조원 추가 로직 구현
     console.log("조원 삭제 버튼 클릭됨");
-    // fetch("https://blog-nvf1.onrender.com/team_list")
-    fetch("http://localhost:4000/teamDelete",{
+    fetch("https://blog-nvf1.onrender.com/team_list",{
+    // fetch("http://localhost:4000/teamDelete",{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

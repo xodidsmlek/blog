@@ -2,7 +2,7 @@ import {useState,useRef, useEffect} from "react";
 import data from "../../assets/data/data.json"
 import "../../assets/styles/FourWord.css";
 import thangBgm from "../../../public/bgm/thang.mp3"
-
+ 
 function FourWord() {
   const [firstWord, setFirstWord]   = useState('단');
   const [secondWord, setSecondWord] = useState('어');
@@ -48,15 +48,8 @@ function FourWord() {
   return (
     <div>
       <div className="title">4글자 게임</div>
-      <div className={`screen ${on==='screen'?"screen_on":""}`}>
-        <div className="word">{firstWord}</div>
-        <div className="word">{secondWord}</div>
-        <div className="word">{thirdWord}</div>
-        <div className="word">{fourthWord}</div>
-      </div>
-      <div className={`answer_screen  ${on==='answer'?"screen_on":""}`}>
-        <div className="answer">{answer}</div>
-      </div>
+      <div className={`screen ${on==='screen'?"screen_on":""}`}>{firstWord} {secondWord} {thirdWord} {fourthWord}</div>
+      <div className={`answer_screen  ${on==='answer'?"screen_on":""}`}>{answer}</div>
 
       <div className={`word_btn_box`}>
         <div onClick={()=>randomWord()} className="btn">단어</div>

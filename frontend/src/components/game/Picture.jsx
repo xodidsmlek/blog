@@ -9,7 +9,10 @@ function Picture() {
   const [img, setImg] = useState("../../../public/images/people1.jpg");
   
   function pictureWord(){
-    let word = data.picture[Math.floor(Math.random()*data.picture.length)];
+    const randomNum = Math.floor(Math.random()*data.picture.length);
+    let word = data.picture[randomNum];
+    let path = "../../../public/images/picture/"+(randomNum+1)+".jpg";
+    setImg(path);
     setName(word);
   }
 

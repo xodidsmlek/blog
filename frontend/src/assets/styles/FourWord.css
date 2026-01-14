@@ -7,37 +7,27 @@
 }
 
 .screen{
-    width: 80%;
+    width: 100%;
     background-color: white;
     border: 3px solid black;
     min-height: 300px;
-    margin: 0 10%;
-    display: none;
-    grid-template-columns: repeat(4, 1fr);
-}
-
-.answer_screen{
-    width: 80%;
-    background-color: white;
-    border: 3px solid black;
-    min-height: 300px;
-    margin: 0 10%;
-    display: none;
-    grid-template-columns: repeat(1, 1fr);
-    padding-top: 30px;
-}
-
-.answer{
     font-size: 150px;
     text-align: center;
     font-weight: bold;
+    display: none;
 }
 
-.word{
+.answer_screen{
+    width: 100%;
+    background-color: white;
+    border: 3px solid black;
+    min-height: 300px;
     font-size: 150px;
-    padding: 10px 0 0 150px;
     font-weight: bold;
+    text-align: center;
+    display: none;
 }
+
 
 .word_btn_box{
     display: grid;
@@ -65,5 +55,5 @@
 }
 
 .screen_on{
-    display: grid;
+    display: block;
 }

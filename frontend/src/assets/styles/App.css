@@ -13,7 +13,6 @@
   background-color: #fffaf5; /* 포근한 베이지/아이보리톤 */
   padding: 30px;
   border-radius: 16px; /* 뭉툭하게 둥글게 */
-  margin-left: 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* 살짝 그림자 */
   color: #333;
 
@@ -78,13 +77,12 @@
   cursor: pointer;
   transition: box-shadow 0.3s ease;
   font-weight: bold;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.4);
   vertical-align: middle;
 }
 
 .btn:hover{
   background: #aaa;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .floatL{

@@ -30,7 +30,7 @@ function AbsolutePitch() {
   return (
     <div>
       <div className="title">청개구리 절대음감</div>
-      <div className={`answer_screen screen_on`}>
+      <div className={`pitch_screen`}>
         <div className="answer">{answer}</div>
       </div>
       <div className={`pitch_btn_box`}>

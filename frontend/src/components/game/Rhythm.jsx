@@ -3,6 +3,9 @@ import rhythmBgm from "../../../public/bgm/rhythm.mp3"
 import "../../assets/styles/Rhythm.css";
 
 function Rhythm() {
+    const URL = "https://blog-nvf1.onrender.com";
+    // const URL = "http://localhost:4000";
+    
     const [selectedTeam, setSelectedTeam] = useState(null);
     const audioRef = useRef(null);
     const [running, setRunning] = useState(false);
@@ -134,8 +137,7 @@ function Rhythm() {
     }, [running]);
 
     useEffect(() => {
-        fetch("https://blog-nvf1.onrender.com/team_list")
-        // fetch("http://localhost:4000/team_list")
+        fetch(URL+"/team_list")
         .then((res) => res.json())
         .then(data => {
             const grouped = data.reduce((acc, cur) => {
@@ -146,8 +148,7 @@ function Rhythm() {
             setTeamMembers(grouped);
         });
 
-        fetch("https://blog-nvf1.onrender.com/team_nm_list")
-        // fetch("http://localhost:4000/team_nm_list")
+        fetch(URL+"/team_nm_list")
         .then((res) => res.json())
         .then(data => {
             setTeamNames(data);

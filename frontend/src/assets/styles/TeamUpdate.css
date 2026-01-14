@@ -1,0 +1,18 @@
+.input_box{
+    width: 50%;
+    float: left;
+}
+
+.list_box{
+    width: 50%;
+    float: left;
+}
+
+input{
+    margin: 3px;
+    display: block;
+}
+
+.input_btn{
+    margin: 3px;
+}

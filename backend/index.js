@@ -50,7 +50,8 @@ app.post('/detail_team_list', async (req, res) => {
 
 // 등록
 app.post('/teamInsert', (req, res) => {
-  const { f_nm, l_nm, team } = req.body;
+  const { f_nm, l_nm, team, pw } = req.body;
+  if(pw != "20yearsoldup")return res.status(401).json({ message: '땡!' });
 
   const result = db.prepare(
     'INSERT INTO team_user (f_nm, l_nm, team) VALUES (?, ?, ?)'
@@ -61,7 +62,8 @@ app.post('/teamInsert', (req, res) => {
 
 // 수정
 app.post('/teamUpdate', (req, res) => {
-  const { id, f_nm, l_nm, team } = req.body;
+  const { id, f_nm, l_nm, team, pw } = req.body;
+  if(pw != "20yearsoldup")return res.status(401).json({ message: '땡!' });
 
   const result = db.prepare(
     'UPDATE team_user SET f_nm = ?, l_nm = ?, team = ? WHERE id = ?'
@@ -71,12 +73,25 @@ app.post('/teamUpdate', (req, res) => {
 });
 
 // 삭제
-app.post('/teamDelete', (req, res) => {
-  const { id } = req.body;
+app.post('/idDelete', (req, res) => {
+  const { id, pw } = req.body;
+  if(pw != "20yearsoldup")return res.status(401).json({ message: '땡!' });
 
   const result = db.prepare(
     'DELETE FROM team_user WHERE id = ?'
   ).run(id);
+
+  res.json();
+});
+
+// 팀 전체 삭제
+app.post('/teamDelete', (req, res) => {
+  const { team, pw } = req.body;
+  if(pw != "20yearsoldup")return res.status(401).json({ message: '땡!' });
+
+  const result = db.prepare(
+    'DELETE FROM team_user WHERE team = ?'
+  ).run(team);
 
   res.json();
 });

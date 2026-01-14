@@ -2,6 +2,8 @@
     background: #eee;
     text-align: center;
     border-radius: 8px;
+    width: 30%;
+    min-width: 400px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
 }
 
@@ -13,5 +15,10 @@
 
 .picture_img img{
     margin: 20px 0;
-    width: 60%;
+    width: 100%;
+}
+
+.picture_box{
+    display: flex;
+    justify-content: center; /* 가로 중앙 */
 }

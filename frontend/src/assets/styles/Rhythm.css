@@ -6,24 +6,23 @@
 }
 
 .deck {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    width: 100%;
-
+    display: block;
+    height: 427px;
 }
 
 .card {
     background: #eee;
     text-align: center;
     border-radius: 8px;
-    width :100%;
-    aspect-ratio: 1 / 1; /* 가로 : 세로 = 1:1 */
+    width :23%;
+    margin: 1%;
+    float: left;
+    aspect-ratio: 1 / 0.5; /* 가로 : 세로 = 1:1 */
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.4);
     opacity: 0;
     transform: scale(0.7);
     transition: transform 0.2s ease;
-
+    display: block;
 }
 
 .card:hover{

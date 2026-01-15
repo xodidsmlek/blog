@@ -31,7 +31,7 @@ app.get('/team_nm_list', async (req, res) => {
   console.log("Received request for /team_list");
   
   const result = db.prepare(
-    'SELECT DISTINCT team FROM team_user WHERE use_yn = \'Y\' ORDER BY id'
+    'SELECT DISTINCT team FROM team_user WHERE use_yn = \'Y\' ORDER BY team'
   ).all();
 
   res.json(result);

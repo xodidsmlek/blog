@@ -17,8 +17,8 @@ const ROUND_TIMINGS = {
 };
 
 function Rhythm() {
-    //const URL = "https://blog-nvf1.onrender.com";
-    const URL = "http://localhost:4000";
+    const URL = "https://blog-nvf1.onrender.com";
+    //const URL = "http://localhost:4000";
 
     const [selectedTeam, setSelectedTeam] = useState(null);
     const audioRef = useRef(null);

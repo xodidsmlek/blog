@@ -155,3 +155,36 @@
     border-radius: 6px;
     border: 1px solid rgba(6, 182, 212, 0.2);
 }
+
+.filter_group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+}
+
+.filter_btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter_btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.filter_btn.active {
+    background: linear-gradient(135deg, var(--accent-secondary) 0%, rgba(6, 182, 212, 0.6) 100%);
+    border-color: var(--accent-secondary);
+    color: #fff;
+    box-shadow: var(--shadow-glow-cyan);
+}

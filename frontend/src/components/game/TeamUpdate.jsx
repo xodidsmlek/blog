@@ -8,6 +8,7 @@ function TeamUpdate() {
   const [team, setTeam] = useState("");
   const [pw, setPw] = useState("");
   const [list, setList] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState("전체");
   //const URL = "https://blog-nvf1.onrender.com";
   const URL = "http://localhost:4000";
 
@@ -100,6 +101,12 @@ function TeamUpdate() {
     }).then();
   }
 
+  const teams = ["전체", ...Array.from(new Set(list.map((item) => item.team).filter(Boolean))).sort()];
+
+  const filteredList = selectedTeam === "전체"
+    ? list
+    : list.filter((member) => member.team === selectedTeam);
+
   return (
     <div>
       <div className="title">전체목록 조회</div>
@@ -123,8 +130,21 @@ function TeamUpdate() {
 
         <div className="list_box">
           <div className="list_title">조회 목록</div>
+          
+          <div className="filter_group">
+            {teams.map((t) => (
+              <button
+                key={t}
+                className={`filter_btn ${selectedTeam === t ? "active" : ""}`}
+                onClick={() => setSelectedTeam(t)}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
           <div className="team_member_list">
-            {list.map((detail) => (
+            {filteredList.map((detail) => (
               <div key={detail.id} className="member_item">
                 <div className="member_info">
                   {detail.f_nm} {detail.l_nm}

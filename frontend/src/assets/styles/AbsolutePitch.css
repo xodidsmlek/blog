@@ -1,18 +1,33 @@
-.pitch_btn_box{
+.pitch_screen {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(36px, 6vw, 64px);
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
+    margin-bottom: 24px;
+}
+
+.pitch_btn_box {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
-    margin: 30px 0 0 0;
-    text-align: center;
+    margin: 24px 0;
 }
 
-.pitch_screen{
-    width: 100%;
-    background-color: white;
-    border: 3px solid black;
-    min-height: 300px;
-    font-size: 75px;
-    text-align: center;
-    font-weight: bold;
-    display: block;
+.pitch_screen .answer {
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { text-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
+    50% { text-shadow: 0 0 25px rgba(6, 182, 212, 0.5); }
 }

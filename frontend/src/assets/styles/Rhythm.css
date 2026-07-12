@@ -1,91 +1,122 @@
-.round{
+/* Round Color Themes (Rose-to-Red Escalating Gradient) */
+.round-theme-0,
+.round-theme-1 {
+    --round-accent: #ffe4e6; /* 아주 연한 복숭아 핑크 (Rose 100) */
+    --round-glow: rgba(255, 228, 230, 0.18);
+}
+.round-theme-2 {
+    --round-accent: #fda4af; /* 연한 핑크 로즈 (Rose 300) */
+    --round-glow: rgba(253, 164, 175, 0.3);
+}
+.round-theme-3 {
+    --round-accent: #fb7185; /* 코랄/로즈 핑크 (Rose 400) */
+    --round-glow: rgba(251, 113, 133, 0.43);
+}
+.round-theme-4 {
+    --round-accent: #f43f5e; /* 진홍빛 (Rose 500) */
+    --round-glow: rgba(244, 63, 94, 0.55);
+}
+.round-theme-5 {
+    --round-accent: #ef4444; /* 타오르는 적색 경보 (Red 500) */
+    --round-glow: rgba(239, 68, 68, 0.75);
+}
+
+.round {
     text-align: center;
-    font-size: 50px;
-    font-weight: bold;
-    margin-bottom: 40px;
+    font-size: clamp(24px, 5vw, 44px);
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--round-accent);
+    text-shadow: 0 0 15px var(--round-glow);
+    letter-spacing: 2px;
+    transition: all 0.5s ease;
 }
 
 .deck {
-    display: block;
-    height: 427px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+    .deck {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .card {
-    background: #eee;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
     text-align: center;
-    border-radius: 8px;
-    width :23%;
-    margin: 1%;
-    float: left;
-    aspect-ratio: 1 / 0.5; /* 가로 : 세로 = 1:1 */
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transform: scale(0.7);
-    transition: transform 0.2s ease;
-    display: block;
-}
-
-.card:hover{
-    box-shadow: 0px 0px 11px rgba(0, 0, 0, 0.4);
-}
-
-.card-image img{
-    width: 80%;
-    height: auto;
-    border-radius: 4px;
-    margin-bottom: 12px;
+    border-radius: 16px;
+    aspect-ratio: 1.6 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    opacity: 0.25;
+    transform: scale(0.92);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .card-name {
-    font-size: 25px;
-    font-weight: bold;
-    margin-bottom: 8px;
+    font-size: clamp(14px, 3.5vw, 22px);
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+    letter-spacing: 1px;
 }
 
+.card.action {
+    transform: scale(1.04);
+    opacity: 1;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, var(--round-glow) 100%);
+    border-color: var(--round-accent);
+    box-shadow: 0 0 20px var(--round-glow), 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card.action .card-name {
+    color: #fff;
+    text-shadow: 0 0 10px var(--round-accent);
+}
+
+/* Lists layout */
 .team-list, .level-list {
-    margin-top: 40px;
-    display: grid;
-
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-}
-
-.level-list {
-    margin-top: 40px;
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
 }
 
 .team, .level {
-    background: #eee;
-    padding: 20px; 
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
     text-align: center;
-    border-radius: 8px;
-    height: 20px;
-    /* border : 3px solid #333; */
+    border-radius: 12px;
     cursor: pointer;
-    transition: box-shadow 0.3s ease;
-    font-weight: bold;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
 }
 
 .team:hover, .level:hover {
-    background: #aaa;
-    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-primary);
+    border-color: var(--text-muted);
 }
 
-.team.selected, .card.selected, .level.selected{
-    background: black;
-    opacity: 0.7;
+.team.selected, .level.selected {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, rgba(99, 102, 241, 0.4) 100%) !important;
     color: white;
-}
-.team.selected:hover, .card.selected:hover, .level.selected:hover {
-    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.4);
-}
-
-.action{
-    transform: scale(1);
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-glow);
     opacity: 1;
 }

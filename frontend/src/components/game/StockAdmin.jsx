@@ -431,7 +431,8 @@ function StockAdmin() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {stocks.map((s) => {
                   const isExpanded = expandedStockId === s.id;
-                  const priceDiff  = s.prevPrice ? s.currentPrice - s.prevPrice : null;
+                  const pct = s.prevPrice ? ((s.currentPrice - s.prevPrice) / s.prevPrice) * 100 : null;
+                  const roundedPct = pct !== null ? (pct > 0 ? Math.floor(pct) : Math.ceil(pct)) : null;
                   return (
                     <div key={s.id} style={{ background: "#f9fafb", borderRadius: 10, border: "1px solid #e5e7eb", overflow: "hidden" }}>
                       {/* 요약 행 */}
@@ -442,9 +443,9 @@ function StockAdmin() {
                           </div>
                           <div style={{ ...S.row, gap: 6, flexWrap: "wrap" }}>
                             <span style={{ fontSize: 12, fontWeight: 700, color: "#1f2937" }}>{s.currentPrice?.toLocaleString()}원</span>
-                            {priceDiff !== null && (
-                              <span style={{ fontSize: 11, color: priceDiff >= 0 ? "#dc2626" : "#2563eb", fontWeight: 600 }}>
-                                ({priceDiff >= 0 ? "+" : ""}{priceDiff?.toLocaleString()}원)
+                            {roundedPct !== null && (
+                              <span style={{ fontSize: 11, color: roundedPct >= 0 ? "#dc2626" : "#2563eb", fontWeight: 700 }}>
+                                ({roundedPct >= 0 ? "+" : ""}{roundedPct}%)
                               </span>
                             )}
                             {s.nextTurnChangeRate !== null && s.nextTurnChangeRate !== undefined && (

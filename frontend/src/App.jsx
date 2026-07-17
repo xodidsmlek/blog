@@ -7,6 +7,7 @@ function App() {
   const [posts, setPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState('rhythm'); // Default to rhythm game
   const [onSidebar, setOnSidebar] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     console.log("Fetching team list...");
@@ -14,7 +15,30 @@ function App() {
       // fetch("http://localhost:4000/team_list")
       .then((res) => res.json())
       .then(setPosts);
+
+    // URL query parameter ?admin=true 체크
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("admin") === "true") {
+      setIsAdmin(true);
+      localStorage.setItem("show_admin_menu", "true");
+    } else if (localStorage.getItem("show_admin_menu") === "true") {
+      setIsAdmin(true);
+    }
   }, []);
+
+  const handleBrandDoubleClick = () => {
+    const pw = prompt("관리자 비밀키를 입력하세요:");
+    if (pw === "turnstockadmin123") {
+      setIsAdmin((prev) => {
+        const next = !prev;
+        localStorage.setItem("show_admin_menu", next ? "true" : "false");
+        alert(next ? "⚙️ 관리자 메뉴가 활성화되었습니다." : "⚙️ 관리자 메뉴가 비활성화(숨김)되었습니다.");
+        return next;
+      });
+    } else {
+      alert("비밀번호가 올바르지 않습니다.");
+    }
+  };
 
   return (
     <div className="app-container">
@@ -38,8 +62,12 @@ function App() {
           <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", padding: "0 16px 6px 16px", textTransform: "uppercase", fontWeight: "bold", letterSpacing: "0.5px" }}>주식 게임</div>
           
           <div className={`side_menu ${selectedPost === 'stockUser' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockUser'); setOnSidebar(''); }}>📈 주식게임 유저 화면</div>
-          <div className={`side_menu ${selectedPost === 'stockAdmin' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockAdmin'); setOnSidebar(''); }}>👑 주식게임 매니저 화면</div>
-          <div className={`side_menu ${selectedPost === 'stockGameManager' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockGameManager'); setOnSidebar(''); }}>⚙️ 게임 마스터 (게임관리)</div>
+          {isAdmin && (
+            <>
+              <div className={`side_menu ${selectedPost === 'stockAdmin' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockAdmin'); setOnSidebar(''); }}>👑 주식게임 매니저 화면</div>
+              <div className={`side_menu ${selectedPost === 'stockGameManager' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockGameManager'); setOnSidebar(''); }}>⚙️ 게임 마스터 (게임관리)</div>
+            </>
+          )}
         </div>
       </aside>
 
@@ -53,7 +81,7 @@ function App() {
             </svg>
             <span>Menu</span>
           </button>
-          <div className="app-brand">GAMES</div>
+          <div className="app-brand" onDoubleClick={handleBrandDoubleClick} style={{ cursor: "pointer", userSelect: "none" }}>GAMES</div>
         </header>
         <div className="content-body">
           <Main menu={selectedPost} />

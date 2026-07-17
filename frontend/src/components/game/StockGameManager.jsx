@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-// 🔴 비밀번호 설정 주석 (원하는 비밀번호로 커스텀하여 사용하세요)
-// 1차 화면 비밀번호 (일반 사용자 접근 제한용): "1111"
-// 2차 서버 비밀번호 (백엔드 전송 및 실제 검증용): "turnstockadmin123"
-const CLIENT_SCREEN_PW = "1111";
+// 🔴 비밀번호 설정 주석
+// 관리자 비밀번호: "turnstockadmin123"
+const ADMIN_PASSWORD = "turnstockadmin123";
 
 const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
   ? "http://localhost:4000"
@@ -18,15 +17,21 @@ function StockGameManager() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    if (isAuthorized) {
+      fetchGames();
+    }
+  }, [isAuthorized]);
+
   // 화면 암호 체크
   const handleAuthorize = (e) => {
     e.preventDefault();
-    if (screenPw === CLIENT_SCREEN_PW) {
+    if (screenPw === ADMIN_PASSWORD) {
       setIsAuthorized(true);
+      setServerPw(screenPw);
       setError("");
-      fetchGames();
     } else {
-      setError("화면 비밀번호가 올바르지 않습니다.");
+      setError("비밀번호가 올바르지 않습니다.");
     }
   };
 
@@ -166,18 +171,7 @@ function StockGameManager() {
         </button>
       </div>
 
-      {/* 2차 비밀번호 입력창 */}
-      <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-sm">
-        <h3 className="text-sm font-semibold text-amber-800 mb-2">🔑 2차 서버 비밀번호 입력</h3>
-        <p className="text-xs text-amber-700 mb-3">데이터 추가/수정/삭제 시 서버 인증에 사용됩니다.</p>
-        <input
-          type="password"
-          value={serverPw}
-          onChange={(e) => setServerPw(e.target.value)}
-          placeholder="서버 비밀번호를 입력하세요"
-          className="w-full px-4 py-2 bg-white border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
-        />
-      </div>
+
 
       {/* 새 게임 생성 */}
       <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100">

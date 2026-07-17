@@ -412,7 +412,8 @@ app.put('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) => {
   try {
     const stockRef = firestore.collection('stocks').doc(stockId);
     const doc = await stockRef.get();
-    if (!doc.exists || doc.data().game !== id) {
+    const gameId = doc.data().game || doc.data().game_id;
+    if (!doc.exists || gameId !== id) {
       return res.status(404).json({ error: "주식 종목을 찾을 수 없습니다." });
     }
 
@@ -437,7 +438,8 @@ app.delete('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) =>
   try {
     const stockRef = firestore.collection('stocks').doc(stockId);
     const doc = await stockRef.get();
-    if (!doc.exists || doc.data().game !== id) {
+    const gameId = doc.data().game || doc.data().game_id;
+    if (!doc.exists || gameId !== id) {
       return res.status(404).json({ error: "주식을 찾을 수 없습니다." });
     }
 
@@ -703,14 +705,24 @@ app.get('/api/games/:id/news', checkFirestore, async (req, res) => {
   try {
     const snap = await firestore.collection('news')
       .where('game', '==', id)
-      .orderBy('turnNo', 'desc')
-      .orderBy('createdAt', 'desc')
       .get();
 
     const news = [];
     snap.forEach(doc => {
       news.push({ id: doc.id, ...doc.data() });
     });
+
+    // composite index 에러 방지를 위해 메모리상에서 정렬
+    news.sort((a, b) => {
+      const turnA = Number(a.turnNo || 0);
+      const turnB = Number(b.turnNo || 0);
+      if (turnB !== turnA) return turnB - turnA;
+      
+      const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+      const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+      return timeB - timeA;
+    });
+
     res.json(news);
   } catch (error) {
     console.error(error);
@@ -737,6 +749,91 @@ app.post('/api/games/:id/news', checkFirestore, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "속보 등록 실패" });
+  }
+});
+
+// 19. 유저 예수금 추가/차감 (매니저)
+app.post('/api/games/:id/users/:userId/add-cash', checkFirestore, async (req, res) => {
+  const { id, userId } = req.params;
+  const { amount, server_pw } = req.body;
+
+  if (server_pw !== SERVER_ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "비밀번호가 일치하지 않습니다." });
+  }
+
+  if (amount === undefined || isNaN(Number(amount))) {
+    return res.status(400).json({ error: "변경할 금액을 올바르게 입력해 주세요." });
+  }
+
+  try {
+    const userRef = firestore.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
+    }
+
+    const gameId = userDoc.data().game || userDoc.data().game_id;
+    if (gameId !== id) {
+      return res.status(404).json({ error: "이 게임에 속하지 않은 유저입니다." });
+    }
+
+    const currentCash = userDoc.data().cash || 0;
+    const newCash = Math.max(0, currentCash + Number(amount));
+
+    await userRef.update({
+      cash: newCash
+    });
+
+    res.json({ cash: newCash, message: `예수금이 변경되었습니다. (현재: ${newCash.toLocaleString()}원)` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "예수금 변경 실패" });
+  }
+});
+
+// 20. 유저 삭제/추방 (매니저)
+app.delete('/api/games/:id/users/:userId', checkFirestore, async (req, res) => {
+  const { id, userId } = req.params;
+  const { server_pw } = req.body;
+
+  // req.body나 query parameter 등에서 비밀번호 확인
+  const verifyPw = server_pw || req.headers['x-server-pw'];
+
+  if (verifyPw !== SERVER_ADMIN_PASSWORD) {
+    return res.status(401).json({ error: "비밀번호가 일치하지 않습니다." });
+  }
+
+  try {
+    const userRef = firestore.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
+    }
+
+    const gameId = userDoc.data().game || userDoc.data().game_id;
+    if (gameId !== id) {
+      return res.status(404).json({ error: "이 게임에 속하지 않은 유저입니다." });
+    }
+
+    const batch = firestore.batch();
+    batch.delete(userRef);
+
+    // 유저 보유 주식 삭제
+    const userStockSnap = await firestore.collection('user_stocks').where('user', '==', userId).get();
+    userStockSnap.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    const userStockSnapOld = await firestore.collection('user_stocks').where('user_id', '==', userId).get();
+    userStockSnapOld.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+    res.json({ message: "참가자가 정상적으로 삭제/추방되었습니다." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "유저 삭제 실패" });
   }
 });
 

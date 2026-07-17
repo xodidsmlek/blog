@@ -4,7 +4,13 @@ const API_BASE_URL = window.location.hostname === "localhost" || window.location
   ? "http://localhost:4000"
   : "https://blog-nvf1.onrender.com";
 
+// 관리자 비밀번호: "turnstockadmin123"
+const ADMIN_PASSWORD = "turnstockadmin123";
+
 function StockAdmin() {
+  const [screenPw, setScreenPw] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [serverPw, setServerPw] = useState("");
   const [games, setGames] = useState([]);
   const [selectedGameId, setSelectedGameId] = useState("");
   const [gameStatus, setGameStatus] = useState(null);
@@ -17,16 +23,30 @@ function StockAdmin() {
   const [newStockName, setNewStockName] = useState("");
   const [newStockPrice, setNewStockPrice] = useState("");
   const [editPriceMap, setEditPriceMap] = useState({}); // stockId -> price
-  const [noticeText, setNoticeText] = useState("");
   const [newNewsTurn, setNewNewsTurn] = useState("");
   const [newNewsContent, setNewNewsContent] = useState("");
+  const [adjustCashMap, setAdjustCashMap] = useState({}); // userId -> cash (string)
 
   const [error, setError] = useState("");
 
   // 오픈된 게임 목록 불러오기
   useEffect(() => {
-    fetchOpenGames();
-  }, []);
+    if (isAuthorized) {
+      fetchOpenGames();
+    }
+  }, [isAuthorized]);
+
+  // 화면 암호 체크
+  const handleAuthorize = (e) => {
+    e.preventDefault();
+    if (screenPw === ADMIN_PASSWORD) {
+      setIsAuthorized(true);
+      setServerPw(screenPw);
+      setError("");
+    } else {
+      setError("비밀번호가 올바르지 않습니다.");
+    }
+  };
 
   const fetchOpenGames = async () => {
     try {
@@ -133,12 +153,11 @@ function StockAdmin() {
       const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/turn/next`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notice: noticeText })
+        body: JSON.stringify({})
       });
       const data = await res.json();
       if (res.ok) {
         alert(data.message);
-        setNoticeText("");
         fetchGameDetails();
         // 유저 정보도 만약 열려있다면 새로고침
         if (showUsers) {
@@ -253,6 +272,81 @@ function StockAdmin() {
     }
   };
 
+  // 예수금 조정
+  const handleAdjustCash = async (userId, uName) => {
+    const amount = adjustCashMap[userId];
+    if (!amount || isNaN(Number(amount))) return alert("변경할 금액을 숫자로 올바르게 입력해 주세요.");
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users/${userId}/add-cash`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: Number(amount), server_pw: serverPw })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(`${uName}님의 예수금이 변경되었습니다. (변동금액: ${Number(amount).toLocaleString()}원)`);
+        setAdjustCashMap({ ...adjustCashMap, [userId]: "" });
+        fetchUsers();
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      alert("예수금 변경 실패");
+    }
+  };
+
+  // 유저 삭제/추방
+  const handleDeleteUser = async (userId, uName) => {
+    if (!window.confirm(`정말 [${uName}] 유저를 강제 추방/삭제하시겠습니까?\n유저의 모든 가상 자산과 거래 내역이 삭제됩니다.`)) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users/${userId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ server_pw: serverPw })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("유저가 정상적으로 삭제되었습니다.");
+        fetchUsers();
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      alert("유저 삭제 실패");
+    }
+  };
+
+  if (!isAuthorized) {
+    return (
+      <div className="stock-pw-screen">
+        <div className="card shadow-lg p-6 max-w-sm w-full mx-auto mt-12 bg-white rounded-2xl">
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">👑 주식게임 매니저 로그인</h2>
+          <form onSubmit={handleAuthorize} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">매니저 비밀번호 입력</label>
+              <input
+                type="password"
+                value={screenPw}
+                onChange={(e) => setScreenPw(e.target.value)}
+                placeholder="비밀번호를 입력하세요"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200"
+            >
+              매니저 화면 활성화
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="stock-container max-w-md mx-auto p-4 space-y-6">
       <div className="bg-gray-800 text-white p-4 rounded-xl shadow-md">
@@ -321,16 +415,6 @@ function StockAdmin() {
 
             {/* 다음 턴 진행 폼 */}
             <div className="border-t border-gray-100 pt-3 space-y-3">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">새 공지사항 (턴이 넘어갈 때 유저화면에 노출됨)</label>
-                <input
-                  type="text"
-                  value={noticeText}
-                  onChange={(e) => setNoticeText(e.target.value)}
-                  placeholder="예: 금리 인상 발표 예정, 관련주 변동폭 확대"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
               <button
                 onClick={handleNextTurn}
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg text-xs transition"
@@ -490,7 +574,7 @@ function StockAdmin() {
                             총 자산: {u.totalAssets.toLocaleString()}원
                           </span>
                         </div>
-                        <div className="text-[11px] text-gray-500 space-y-1">
+                        <div className="text-[11px] text-gray-500 space-y-1 pb-2">
                           <div>예수금: {u.cash.toLocaleString()}원</div>
                           <div>
                             보유주식:{" "}
@@ -505,6 +589,32 @@ function StockAdmin() {
                               ))
                             )}
                           </div>
+                        </div>
+
+                        {/* 예수금 충전 및 삭제 조작 패널 */}
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 mt-2">
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              placeholder="금액 (양수 추가, 음수 차감)"
+                              value={adjustCashMap[u.id] || ""}
+                              onChange={(e) => setAdjustCashMap({ ...adjustCashMap, [u.id]: e.target.value })}
+                              className="px-2 py-1 border border-gray-200 rounded-md text-xs w-28"
+                              style={{ padding: "4px 8px" }}
+                            />
+                            <button
+                              onClick={() => handleAdjustCash(u.id, u.userName)}
+                              className="bg-blue-600 text-white text-[10px] px-2.5 py-1.5 rounded-md hover:bg-blue-700 font-bold"
+                            >
+                              예수금 변경
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.userName)}
+                            className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-[10px] px-2.5 py-1.5 rounded-md font-bold transition"
+                          >
+                            유저 삭제
+                          </button>
                         </div>
                       </div>
                     ))}

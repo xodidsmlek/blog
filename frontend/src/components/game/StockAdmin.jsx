@@ -4,39 +4,65 @@ const API_BASE_URL = window.location.hostname === "localhost" || window.location
   ? "http://localhost:4000"
   : "https://blog-nvf1.onrender.com";
 
-// 관리자 비밀번호: "turnstockadmin123"
 const ADMIN_PASSWORD = "turnstockadmin123";
 
+/* ─── 공통 인라인 스타일 팔레트 ─── */
+const S = {
+  page:    { padding: "12px", maxWidth: "100%", boxSizing: "border-box", fontFamily: "sans-serif" },
+  card:    { background: "#fff", borderRadius: 14, boxShadow: "0 2px 10px rgba(0,0,0,.07)", border: "1px solid #f0f0f0", marginBottom: 14, padding: "16px" },
+  header:  { background: "#1f2937", borderRadius: 14, padding: "16px", marginBottom: 14, color: "#fff" },
+  label:   { display: "block", fontSize: 11, color: "#9ca3af", marginBottom: 4, fontWeight: 600 },
+  input:   { width: "100%", boxSizing: "border-box", padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13, outline: "none" },
+  inputSm: { boxSizing: "border-box", padding: "6px 10px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12, outline: "none" },
+  btnPrimary:  { background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" },
+  btnDanger:   { background: "#fee2e2", color: "#dc2626", border: "none", borderRadius: 8, padding: "7px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" },
+  btnDark:     { background: "#1f2937", color: "#fff", border: "none", borderRadius: 8, padding: "7px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" },
+  btnGray:     { background: "#f3f4f6", color: "#374151", border: "none", borderRadius: 8, padding: "7px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" },
+  btnSuccess:  { background: "#059669", color: "#fff", border: "none", borderRadius: 8, padding: "7px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" },
+  btnBlock:    { width: "100%", display: "block", border: "none", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, cursor: "pointer" },
+  divider:     { borderTop: "1px solid #f3f4f6", margin: "12px 0" },
+  row:         { display: "flex", alignItems: "center", gap: 8 },
+  rowBetween:  { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 },
+  badge:       (color) => ({ background: color + "1a", color, borderRadius: 6, padding: "3px 8px", fontSize: 11, fontWeight: 700 }),
+  sectionTitle:{ fontSize: 14, fontWeight: 800, color: "#111827", marginBottom: 10 },
+};
+
 function StockAdmin() {
-  const [screenPw, setScreenPw] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [serverPw, setServerPw] = useState("");
-  const [games, setGames] = useState([]);
+  const [screenPw, setScreenPw]           = useState("");
+  const [isAuthorized, setIsAuthorized]   = useState(false);
+  const [serverPw, setServerPw]           = useState("");
+  const [games, setGames]                 = useState([]);
   const [selectedGameId, setSelectedGameId] = useState("");
-  const [gameStatus, setGameStatus] = useState(null);
-  const [stocks, setStocks] = useState([]);
-  const [news, setNews] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [showUsers, setShowUsers] = useState(false);
+  const [gameStatus, setGameStatus]       = useState(null);
+  const [stocks, setStocks]               = useState([]);
+  const [news, setNews]                   = useState([]);
+  const [users, setUsers]                 = useState([]);
+  const [showUsers, setShowUsers]         = useState(false);
 
   // 입력 폼 상태
-  const [newStockName, setNewStockName] = useState("");
+  const [newStockName, setNewStockName]   = useState("");
   const [newStockPrice, setNewStockPrice] = useState("");
-  const [editPriceMap, setEditPriceMap] = useState({}); // stockId -> price
-  const [newNewsTurn, setNewNewsTurn] = useState("");
+  const [editPriceMap, setEditPriceMap]   = useState({});  // stockId → 수정가격(string)
+  const [editNameMap, setEditNameMap]     = useState({});  // stockId → 수정종목명(string)
+  const [expandedStockId, setExpandedStockId] = useState(null); // 수정 패널 열린 stockId
+
+  const [newNewsTurn, setNewNewsTurn]     = useState("");
   const [newNewsContent, setNewNewsContent] = useState("");
-  const [adjustCashMap, setAdjustCashMap] = useState({}); // userId -> cash (string)
+  const [adjustCashMap, setAdjustCashMap] = useState({});  // userId → amount(string)
 
-  const [error, setError] = useState("");
+  const [error, setError]   = useState("");
+  const [toast, setToast]   = useState("");  // 성공 메시지 토스트
 
-  // 오픈된 게임 목록 불러오기
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2800);
+  };
+
+  // ── Auth ─────────────────────────────────────────
   useEffect(() => {
-    if (isAuthorized) {
-      fetchOpenGames();
-    }
+    if (isAuthorized) fetchOpenGames();
   }, [isAuthorized]);
 
-  // 화면 암호 체크
   const handleAuthorize = (e) => {
     e.preventDefault();
     if (screenPw === ADMIN_PASSWORD) {
@@ -48,26 +74,21 @@ function StockAdmin() {
     }
   };
 
+  // ── 게임 목록 ────────────────────────────────────
   const fetchOpenGames = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games`);
+      const res  = await fetch(`${API_BASE_URL}/api/games`);
       const data = await res.json();
-      if (res.ok) {
-        // Open: Y (is_open === true) 상태인 게임만 관리 가능
-        const openGames = data.filter((g) => g.isOpen);
-        setGames(openGames);
-      }
-    } catch (err) {
-      setError("게임 리스트 로딩 실패");
-    }
+      if (res.ok) setGames(data.filter((g) => g.isOpen));
+    } catch { setError("게임 리스트 로딩 실패"); }
   };
 
-  // 선택한 게임의 상세 정보(턴, 주식, 속보) 페치
   useEffect(() => {
     if (selectedGameId) {
       fetchGameDetails();
-      setShowUsers(false); // 게임 변경 시 유저 리스트 가리기
+      setShowUsers(false);
       setUsers([]);
+      setExpandedStockId(null);
     } else {
       setGameStatus(null);
       setStocks([]);
@@ -75,270 +96,206 @@ function StockAdmin() {
     }
   }, [selectedGameId]);
 
+  // ── 게임 상세 ────────────────────────────────────
   const fetchGameDetails = async () => {
     if (!selectedGameId) return;
     try {
-      // 1) 상태 및 턴 정보
-      const statusRes = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/status`);
-      const statusData = await statusRes.json();
+      const [statusRes, stockRes, newsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/games/${selectedGameId}/status`),
+        fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks`),
+        fetch(`${API_BASE_URL}/api/games/${selectedGameId}/news`),
+      ]);
+
       if (statusRes.ok) {
-        setGameStatus(statusData);
-        setNewNewsTurn(statusData.currentTurn);
+        const d = await statusRes.json();
+        setGameStatus(d);
+        setNewNewsTurn(d.currentTurn);
       }
-
-      // 2) 주식 정보
-      const stockRes = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks`);
-      const stockData = await stockRes.json();
       if (stockRes.ok) {
-        setStocks(stockData);
-        // 수동 수정 폼용 기본값 매핑
-        const priceMap = {};
-        stockData.forEach((s) => {
-          priceMap[s.id] = s.currentPrice;
-        });
-        setEditPriceMap(priceMap);
+        const d = await stockRes.json();
+        setStocks(d);
+        const pm = {}, nm = {};
+        d.forEach((s) => { pm[s.id] = String(s.currentPrice); nm[s.id] = s.stockName; });
+        setEditPriceMap(pm);
+        setEditNameMap(nm);
       }
-
-      // 3) 속보 정보
-      const newsRes = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/news`);
-      const newsData = await newsRes.json();
       if (newsRes.ok) {
-        setNews(newsData);
+        const d = await newsRes.json();
+        setNews(d);
       }
-    } catch (err) {
-      setError("상세 정보를 가져오는 데 실패했습니다.");
-    }
+    } catch { setError("상세 정보를 가져오는 데 실패했습니다."); }
   };
 
-  // 장 오픈/잠금 토글
+  // ── 장 오픈/잠금 ──────────────────────────────────
   const handleToggleLock = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/turn/toggle-lock`, {
-        method: "POST"
-      });
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/turn/toggle-lock`, { method: "POST" });
       const data = await res.json();
-      if (res.ok) {
-        alert(data.message);
-        fetchGameDetails();
-      }
-    } catch (err) {
-      alert("서버 연결 에러");
-    }
+      if (res.ok) { showToast(data.message); fetchGameDetails(); }
+    } catch { alert("서버 연결 에러"); }
   };
 
-  // 자동 판매 활성화 여부 토글
-  const handleToggleAutoSell = async (currentAutoSell) => {
+  // ── 자동판매 토글 ─────────────────────────────────
+  const handleToggleAutoSell = async () => {
+    const cur = gameStatus?.autoSellOnTurnEnd;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/turn/toggle-auto-sell`, {
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/turn/toggle-auto-sell`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ autoSell: !currentAutoSell })
+        body: JSON.stringify({ autoSell: !cur }),
       });
       const data = await res.json();
-      if (res.ok) {
-        alert(data.message);
-        fetchGameDetails();
-      }
-    } catch (err) {
-      alert("서버 연결 에러");
-    }
+      if (res.ok) { showToast(data.message); fetchGameDetails(); }
+    } catch { alert("서버 연결 에러"); }
   };
 
-  // 턴 마감 (다음 턴 진행)
+  // ── 다음 턴 진행 ──────────────────────────────────
   const handleNextTurn = async () => {
-    if (!window.confirm("정말 현재 턴을 마감하고 다음 턴으로 넘어가시겠습니까?\n이때 주가 변동 및 설정에 따라 주식 자동판매가 진행됩니다.")) {
-      return;
-    }
+    if (!window.confirm("정말 현재 턴을 마감하고 다음 턴으로 넘어가시겠습니까?\n이때 주가 변동 및 설정에 따라 주식 자동판매가 진행됩니다.")) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/turn/next`, {
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/turn/next`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
       const data = await res.json();
-      if (res.ok) {
-        alert(data.message);
-        fetchGameDetails();
-        // 유저 정보도 만약 열려있다면 새로고침
-        if (showUsers) {
-          fetchUsers();
-        }
-      } else {
-        alert(data.error);
-      }
-    } catch (err) {
-      alert("서버 연결 에러");
-    }
+      if (res.ok) { showToast(data.message); fetchGameDetails(); if (showUsers) fetchUsers(); }
+      else alert(data.error);
+    } catch { alert("서버 연결 에러"); }
   };
 
-  // 주식 추가
+  // ── 주식 추가 ────────────────────────────────────
   const handleAddStock = async (e) => {
     e.preventDefault();
     if (!newStockName.trim() || !newStockPrice) return alert("종목명과 주가를 입력하세요.");
-
     try {
       const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stockName: newStockName, price: newStockPrice })
+        body: JSON.stringify({ stockName: newStockName.trim(), price: Number(newStockPrice) }),
       });
-      if (res.ok) {
-        setNewStockName("");
-        setNewStockPrice("");
-        fetchGameDetails();
-      } else {
-        const data = await res.json();
-        alert(data.error);
-      }
-    } catch (err) {
-      alert("주식 추가 에러");
-    }
+      if (res.ok) { showToast("주식이 추가되었습니다."); setNewStockName(""); setNewStockPrice(""); fetchGameDetails(); }
+      else { const d = await res.json(); alert(d.error); }
+    } catch { alert("주식 추가 에러"); }
   };
 
-  // 주가 수동 강제 변경
-  const handleUpdateStockPrice = async (stockId) => {
-    const editPrice = editPriceMap[stockId];
-    if (editPrice === undefined || editPrice === "") return alert("수정할 주가를 입력해 주세요.");
+  // ── 주식 수정 (종목명 + 주가 동시) ──────────────────
+  const handleUpdateStock = async (stockId) => {
+    const newPrice = editPriceMap[stockId];
+    const newName  = editNameMap[stockId];
+    if (newPrice === "" || newPrice === undefined) return alert("수정할 주가를 입력해 주세요.");
+
+    const body = {};
+    if (newName && newName.trim()) body.stockName = newName.trim();
+    if (newPrice !== "") body.price = Number(newPrice);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks/${stockId}`, {
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks/${stockId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price: Number(editPrice) })
+        body: JSON.stringify(body),
       });
+      const data = await res.json();
       if (res.ok) {
-        alert("주가가 성공적으로 수정되었습니다.");
+        showToast("주가가 수정되었습니다.");
+        setExpandedStockId(null);
         fetchGameDetails();
       } else {
-        const data = await res.json();
-        alert(data.error);
+        alert(data.error || "수정 실패");
       }
-    } catch (err) {
-      alert("주식 수정 에러");
-    }
+    } catch { alert("주식 수정 에러"); }
   };
 
-  // 주식 삭제
-  const handleDeleteStock = async (stockId) => {
-    if (!window.confirm("정말 이 주식 종목을 삭제하시겠습니까?\n유저가 보유한 해당 주식 데이터도 모두 파기됩니다.")) return;
+  // ── 주식 삭제 ────────────────────────────────────
+  const handleDeleteStock = async (stockId, stockName) => {
+    if (!window.confirm(`정말 [${stockName}] 종목을 삭제하시겠습니까?\n유저가 보유한 해당 주식 데이터도 모두 파기됩니다.`)) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks/${stockId}`, {
-        method: "DELETE"
-      });
-      if (res.ok) {
-        fetchGameDetails();
-      }
-    } catch (err) {
-      alert("주식 삭제 에러");
-    }
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks/${stockId}`, { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok) { showToast("주식이 삭제되었습니다."); fetchGameDetails(); }
+      else alert(data.error || "삭제 실패");
+    } catch { alert("주식 삭제 에러"); }
   };
 
-  // 속보 추가
+  // ── 속보 추가 ────────────────────────────────────
   const handleAddNews = async (e) => {
     e.preventDefault();
     if (!newNewsTurn || !newNewsContent.trim()) return alert("턴 번호와 속보 내용을 입력하세요.");
-
     try {
       const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/news`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ turnNo: Number(newNewsTurn), content: newNewsContent })
+        body: JSON.stringify({ turnNo: Number(newNewsTurn), content: newNewsContent.trim() }),
       });
-      if (res.ok) {
-        setNewNewsContent("");
-        fetchGameDetails();
-      } else {
-        const data = await res.json();
-        alert(data.error);
-      }
-    } catch (err) {
-      alert("속보 등록 실패");
-    }
+      if (res.ok) { showToast("속보가 송출되었습니다!"); setNewNewsContent(""); fetchGameDetails(); }
+      else { const d = await res.json(); alert(d.error); }
+    } catch { alert("속보 등록 실패"); }
   };
 
-  // 유저 목록 조회 (조회 버튼 클릭 시에만 로드)
+  // ── 유저 목록 ────────────────────────────────────
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users`);
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users`);
       const data = await res.json();
-      if (res.ok) {
-        setUsers(data);
-        setShowUsers(true);
-      } else {
-        alert(data.error || "유저 목록 로딩 실패");
-      }
-    } catch (err) {
-      alert("서버 연결 실패");
-    }
+      if (res.ok) { setUsers(data); setShowUsers(true); }
+      else alert(data.error || "유저 목록 로딩 실패");
+    } catch { alert("서버 연결 실패"); }
   };
 
-  // 예수금 조정
+  // ── 예수금 조정 ──────────────────────────────────
   const handleAdjustCash = async (userId, uName) => {
     const amount = adjustCashMap[userId];
-    if (!amount || isNaN(Number(amount))) return alert("변경할 금액을 숫자로 올바르게 입력해 주세요.");
-
+    if (!amount || isNaN(Number(amount))) return alert("변경할 금액을 숫자로 입력해 주세요.");
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users/${userId}/add-cash`, {
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users/${userId}/add-cash`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: Number(amount), server_pw: serverPw })
+        body: JSON.stringify({ amount: Number(amount), server_pw: serverPw }),
       });
       const data = await res.json();
       if (res.ok) {
-        alert(`${uName}님의 예수금이 변경되었습니다. (변동금액: ${Number(amount).toLocaleString()}원)`);
+        showToast(`${uName}님 예수금 변경 완료 (${Number(amount) >= 0 ? "+" : ""}${Number(amount).toLocaleString()}원)`);
         setAdjustCashMap({ ...adjustCashMap, [userId]: "" });
         fetchUsers();
-      } else {
-        alert(data.error);
-      }
-    } catch (err) {
-      alert("예수금 변경 실패");
-    }
+      } else alert(data.error);
+    } catch { alert("예수금 변경 실패"); }
   };
 
-  // 유저 삭제/추방
+  // ── 유저 삭제 ────────────────────────────────────
   const handleDeleteUser = async (userId, uName) => {
-    if (!window.confirm(`정말 [${uName}] 유저를 강제 추방/삭제하시겠습니까?\n유저의 모든 가상 자산과 거래 내역이 삭제됩니다.`)) return;
-
+    if (!window.confirm(`정말 [${uName}] 유저를 강제 추방/삭제하시겠습니까?\n모든 가상 자산과 거래 내역이 삭제됩니다.`)) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users/${userId}`, {
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/users/${userId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ server_pw: serverPw })
+        body: JSON.stringify({ server_pw: serverPw }),
       });
       const data = await res.json();
-      if (res.ok) {
-        alert("유저가 정상적으로 삭제되었습니다.");
-        fetchUsers();
-      } else {
-        alert(data.error);
-      }
-    } catch (err) {
-      alert("유저 삭제 실패");
-    }
+      if (res.ok) { showToast("유저가 삭제되었습니다."); fetchUsers(); }
+      else alert(data.error);
+    } catch { alert("유저 삭제 실패"); }
   };
 
+  // ═══════════════════════════════════════════════════
+  // 로그인 화면
+  // ═══════════════════════════════════════════════════
   if (!isAuthorized) {
     return (
-      <div className="stock-pw-screen">
-        <div className="card shadow-lg p-6 max-w-sm w-full mx-auto mt-12 bg-white rounded-2xl">
-          <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">👑 주식게임 매니저 로그인</h2>
-          <form onSubmit={handleAuthorize} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">매니저 비밀번호 입력</label>
-              <input
-                type="password"
-                value={screenPw}
-                onChange={(e) => setScreenPw(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200"
-            >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", padding: 16 }}>
+        <div style={{ ...S.card, maxWidth: 360, width: "100%", padding: 28 }}>
+          <h2 style={{ textAlign: "center", fontSize: 20, fontWeight: 800, marginBottom: 6, color: "#111827" }}>👑 매니저 로그인</h2>
+          <p style={{ textAlign: "center", fontSize: 12, color: "#9ca3af", marginBottom: 20 }}>관리자 비밀번호를 입력하세요.</p>
+          <form onSubmit={handleAuthorize}>
+            <input
+              type="password"
+              value={screenPw}
+              onChange={(e) => setScreenPw(e.target.value)}
+              placeholder="비밀번호를 입력하세요"
+              style={{ ...S.input, marginBottom: 8 }}
+              autoFocus
+            />
+            {error && <p style={{ color: "#dc2626", fontSize: 12, marginBottom: 8, textAlign: "center" }}>{error}</p>}
+            <button type="submit" style={{ ...S.btnBlock, background: "#2563eb", color: "#fff" }}>
               매니저 화면 활성화
             </button>
           </form>
@@ -347,283 +304,309 @@ function StockAdmin() {
     );
   }
 
+  // ═══════════════════════════════════════════════════
+  // 메인 관리 화면
+  // ═══════════════════════════════════════════════════
   return (
-    <div className="stock-container max-w-md mx-auto p-4 space-y-6">
-      <div className="bg-gray-800 text-white p-4 rounded-xl shadow-md">
-        <h2 className="font-bold text-lg text-center mb-4">👑 주식게임 매니저 콘솔</h2>
-        
-        {/* 게임 선택 셀렉트 */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-300 mb-1.5">관리할 게임 선택 (오픈 상태인 게임만 노출)</label>
-          <select
-            value={selectedGameId}
-            onChange={(e) => setSelectedGameId(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg focus:outline-none border border-gray-600 text-sm"
-          >
-            <option value="">-- 관리할 게임을 선택하세요 --</option>
-            {games.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.gameName} (ID: {g.id})
-              </option>
-            ))}
-          </select>
+    <div style={S.page}>
+
+      {/* 토스트 알림 */}
+      {toast && (
+        <div style={{ position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)", background: "#1f2937", color: "#fff", padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,.2)", whiteSpace: "nowrap" }}>
+          ✅ {toast}
         </div>
+      )}
+
+      {/* 헤더 */}
+      <div style={S.header}>
+        <h2 style={{ textAlign: "center", fontWeight: 800, fontSize: 16, margin: "0 0 12px" }}>👑 주식게임 매니저 콘솔</h2>
+        <label style={{ ...S.label, color: "#9ca3af" }}>관리할 게임 선택 (오픈된 게임만 표시)</label>
+        <select
+          value={selectedGameId}
+          onChange={(e) => setSelectedGameId(e.target.value)}
+          style={{ ...S.input, background: "#374151", color: "#fff", border: "1px solid #4b5563" }}
+        >
+          <option value="">-- 게임을 선택하세요 --</option>
+          {games.map((g) => (
+            <option key={g.id} value={g.id}>{g.gameName}</option>
+          ))}
+        </select>
       </div>
 
-      {error && <div className="bg-red-50 text-red-600 text-xs p-3 rounded-lg border border-red-200">{error}</div>}
+      {error && <div style={{ background: "#fee2e2", color: "#dc2626", padding: "10px 14px", borderRadius: 10, fontSize: 12, marginBottom: 12 }}>{error}</div>}
 
-      {/* 게임 상태 및 제어 판넬 */}
       {selectedGameId && gameStatus && (
-        <div className="space-y-6">
-          
-          {/* 1. 턴 및 상태 관리 카드 */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <span className="text-base font-bold text-gray-800">🏁 턴 및 장 상태</span>
-              <span className="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-md">
-                현재 턴: {gameStatus.currentTurn}턴
-              </span>
+        <>
+          {/* ── 1. 턴 & 장 상태 카드 ── */}
+          <div style={S.card}>
+            <div style={S.rowBetween}>
+              <span style={S.sectionTitle}>🏁 턴 & 장 상태</span>
+              <span style={S.badge("#2563eb")}>현재 {gameStatus.currentTurn}턴</span>
             </div>
-            
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col justify-between">
-                <span className="text-gray-400 font-medium mb-1">현재 장 상태</span>
-                <span className={`font-bold text-sm ${gameStatus.isLocked ? "text-red-500" : "text-green-500"}`}>
-                  {gameStatus.isLocked ? "마감 (잠김)" : "오픈 (거래가능)"}
-                </span>
-                <button
-                  onClick={handleToggleLock}
-                  className="mt-2 text-[10px] bg-gray-200 hover:bg-gray-300 font-bold py-1.5 rounded-md transition"
-                >
+
+            {/* 장 상태 / 자동판매 - 2열 */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
+              <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 14px", border: "1px solid #f0f0f0" }}>
+                <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600, marginBottom: 4 }}>현재 장 상태</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: gameStatus.isLocked ? "#dc2626" : "#059669", marginBottom: 8 }}>
+                  {gameStatus.isLocked ? "🔴 마감" : "🟢 오픈"}
+                </div>
+                <button onClick={handleToggleLock} style={{ ...S.btnGray, width: "100%", fontSize: 11 }}>
                   상태 토글
                 </button>
               </div>
-
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex flex-col justify-between">
-                <span className="text-gray-400 font-medium mb-1">턴 종료 자동판매</span>
-                <span className={`font-bold text-sm ${gameStatus.autoSellOnTurnEnd ? "text-blue-600" : "text-gray-500"}`}>
-                  {gameStatus.autoSellOnTurnEnd ? "활성화(ON)" : "비활성화(OFF)"}
-                </span>
-                <button
-                  onClick={() => handleToggleAutoSell(gameStatus.autoSellOnTurnEnd)}
-                  className="mt-2 text-[10px] bg-gray-200 hover:bg-gray-300 font-bold py-1.5 rounded-md transition"
-                >
+              <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 14px", border: "1px solid #f0f0f0" }}>
+                <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 600, marginBottom: 4 }}>턴종료 자동판매</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: gameStatus.autoSellOnTurnEnd ? "#2563eb" : "#9ca3af", marginBottom: 8 }}>
+                  {gameStatus.autoSellOnTurnEnd ? "✅ ON" : "⬜ OFF"}
+                </div>
+                <button onClick={handleToggleAutoSell} style={{ ...S.btnGray, width: "100%", fontSize: 11 }}>
                   기능 토글
                 </button>
               </div>
             </div>
 
-            {/* 다음 턴 진행 폼 */}
-            <div className="border-t border-gray-100 pt-3 space-y-3">
-              <button
-                onClick={handleNextTurn}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg text-xs transition"
-              >
-                턴 마감 ➔ 다음 턴 진행 (주가 자동 변동)
-              </button>
-            </div>
+            <div style={S.divider} />
+            <button
+              onClick={handleNextTurn}
+              style={{ ...S.btnBlock, background: "#dc2626", color: "#fff" }}
+            >
+              🔄 턴 마감 → 다음 턴 진행 (주가 자동 변동)
+            </button>
           </div>
 
-          {/* 2. 주식 종목 제어 카드 */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 space-y-4">
-            <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-3">📈 주식 종목 관리</h3>
+          {/* ── 2. 주식 종목 관리 카드 ── */}
+          <div style={S.card}>
+            <div style={S.sectionTitle}>📈 주식 종목 관리</div>
 
-            {/* 신규 주식 등록 폼 */}
-            <form onSubmit={handleAddStock} className="flex gap-2 items-end">
-              <div className="flex-1">
-                <label className="block text-[10px] text-gray-400 mb-1">주식명</label>
-                <input
-                  type="text"
-                  value={newStockName}
-                  onChange={(e) => setNewStockName(e.target.value)}
-                  placeholder="예: 삼성전자"
-                  className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs"
-                />
+            {/* 신규 추가 폼 */}
+            <form onSubmit={handleAddStock}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 90px 60px", gap: 8, alignItems: "flex-end" }}>
+                <div>
+                  <label style={S.label}>종목명</label>
+                  <input
+                    type="text"
+                    value={newStockName}
+                    onChange={(e) => setNewStockName(e.target.value)}
+                    placeholder="예: 삼성전자"
+                    style={S.input}
+                  />
+                </div>
+                <div>
+                  <label style={S.label}>주가(원)</label>
+                  <input
+                    type="number"
+                    value={newStockPrice}
+                    onChange={(e) => setNewStockPrice(e.target.value)}
+                    placeholder="10000"
+                    style={S.input}
+                  />
+                </div>
+                <button type="submit" style={{ ...S.btnPrimary, padding: "8px 0", width: "100%" }}>추가</button>
               </div>
-              <div className="w-24">
-                <label className="block text-[10px] text-gray-400 mb-1">주가 (원)</label>
-                <input
-                  type="number"
-                  value={newStockPrice}
-                  onChange={(e) => setNewStockPrice(e.target.value)}
-                  placeholder="10000"
-                  className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs"
-                />
+            </form>
+
+            <div style={S.divider} />
+
+            {/* 종목 리스트 */}
+            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 700, marginBottom: 8 }}>등록된 종목</div>
+            {stocks.length === 0 ? (
+              <p style={{ color: "#9ca3af", fontSize: 12, textAlign: "center", padding: "16px 0" }}>등록된 주식이 없습니다.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {stocks.map((s) => {
+                  const isExpanded = expandedStockId === s.id;
+                  const priceDiff  = s.prevPrice ? s.currentPrice - s.prevPrice : null;
+                  return (
+                    <div key={s.id} style={{ background: "#f9fafb", borderRadius: 10, border: "1px solid #e5e7eb", overflow: "hidden" }}>
+                      {/* 요약 행 */}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px" }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 700, fontSize: 13, color: "#111827", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {s.stockName}
+                          </div>
+                          <div style={{ ...S.row, gap: 6, flexWrap: "wrap" }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "#1f2937" }}>{s.currentPrice?.toLocaleString()}원</span>
+                            {priceDiff !== null && (
+                              <span style={{ fontSize: 11, color: priceDiff >= 0 ? "#dc2626" : "#2563eb", fontWeight: 600 }}>
+                                ({priceDiff >= 0 ? "+" : ""}{priceDiff?.toLocaleString()}원)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                          <button
+                            onClick={() => setExpandedStockId(isExpanded ? null : s.id)}
+                            style={{ ...S.btnDark, fontSize: 11, padding: "6px 10px" }}
+                          >
+                            {isExpanded ? "닫기" : "수정"}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteStock(s.id, s.stockName)}
+                            style={{ ...S.btnDanger, fontSize: 11, padding: "6px 10px" }}
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* 수정 패널 (접었다 펼치기) */}
+                      {isExpanded && (
+                        <div style={{ borderTop: "1px solid #e5e7eb", padding: "12px", background: "#fff", display: "flex", flexDirection: "column", gap: 8 }}>
+                          <div>
+                            <label style={S.label}>종목명 변경</label>
+                            <input
+                              type="text"
+                              value={editNameMap[s.id] ?? s.stockName}
+                              onChange={(e) => setEditNameMap({ ...editNameMap, [s.id]: e.target.value })}
+                              style={S.input}
+                            />
+                          </div>
+                          <div>
+                            <label style={S.label}>주가 강제 변경 (원)</label>
+                            <input
+                              type="number"
+                              value={editPriceMap[s.id] ?? s.currentPrice}
+                              onChange={(e) => setEditPriceMap({ ...editPriceMap, [s.id]: e.target.value })}
+                              style={S.input}
+                            />
+                          </div>
+                          <button
+                            onClick={() => handleUpdateStock(s.id)}
+                            style={{ ...S.btnSuccess, width: "100%", padding: "9px 0" }}
+                          >
+                            ✅ 수정 저장
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              <button
-                type="submit"
-                className="bg-blue-600 text-white font-bold px-3.5 py-2.5 rounded-lg text-xs hover:bg-blue-700 transition"
-              >
-                추가
+            )}
+          </div>
+
+          {/* ── 3. 속보 발송 카드 ── */}
+          <div style={S.card}>
+            <div style={S.sectionTitle}>📰 실시간 속보 발송</div>
+            <form onSubmit={handleAddNews} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "70px 1fr", gap: 8 }}>
+                <div>
+                  <label style={S.label}>노출 턴</label>
+                  <input
+                    type="number"
+                    value={newNewsTurn}
+                    onChange={(e) => setNewNewsTurn(e.target.value)}
+                    style={{ ...S.input, textAlign: "center", fontWeight: 700 }}
+                  />
+                </div>
+                <div>
+                  <label style={S.label}>속보 내용</label>
+                  <input
+                    type="text"
+                    value={newNewsContent}
+                    onChange={(e) => setNewNewsContent(e.target.value)}
+                    placeholder="예: OO전자 해외 수주 잭팟!"
+                    style={S.input}
+                  />
+                </div>
+              </div>
+              <button type="submit" style={{ ...S.btnBlock, background: "#111827", color: "#fff" }}>
+                📡 속보 송출하기
               </button>
             </form>
 
-            {/* 주식 리스트 및 수동 조작 */}
-            <div className="space-y-3 pt-2">
-              <span className="block text-[11px] font-semibold text-gray-400">등록된 종목 및 가격 강제 변경</span>
-              {stocks.length === 0 ? (
-                <p className="text-gray-400 text-xs text-center py-4">등록된 주식이 없습니다.</p>
+            {/* 송출된 속보 내역 */}
+            <div style={S.divider} />
+            <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 700, marginBottom: 8 }}>송출된 속보 내역</div>
+            {news.length === 0 ? (
+              <p style={{ color: "#9ca3af", fontSize: 12, textAlign: "center", padding: "12px 0" }}>등록된 속보가 없습니다.</p>
+            ) : (
+              <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+                {news.map((n) => (
+                  <div key={n.id} style={{ background: "#f9fafb", borderRadius: 8, padding: "8px 12px", border: "1px solid #e5e7eb", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={S.badge("#d97706")}>{n.turnNo}턴</span>
+                    <span style={{ fontSize: 12, color: "#374151", flex: 1 }}>{n.content}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── 4. 유저 자산 현황 카드 ── */}
+          <div style={S.card}>
+            <div style={{ ...S.rowBetween, marginBottom: 12 }}>
+              <span style={S.sectionTitle}>👥 유저 자산 현황</span>
+              <button onClick={fetchUsers} style={{ ...S.btnPrimary, fontSize: 11, padding: "6px 12px" }}>
+                현황 조회
+              </button>
+            </div>
+
+            {showUsers && (
+              users.length === 0 ? (
+                <p style={{ color: "#9ca3af", fontSize: 12, textAlign: "center", padding: "16px 0" }}>참가 중인 유저가 없습니다.</p>
               ) : (
-                <div className="space-y-2">
-                  {stocks.map((s) => (
-                    <div key={s.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs gap-2">
-                      <div className="flex flex-col flex-1">
-                        <span className="font-bold text-gray-700">{s.stockName}</span>
-                        <span className="text-[10px] text-gray-400">
-                          이전: {s.prevPrice ? `${s.prevPrice.toLocaleString()}원` : "-"}
-                        </span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {users.map((u) => (
+                    <div key={u.id} style={{ background: "#f9fafb", borderRadius: 12, border: "1px solid #e5e7eb", padding: "12px 14px" }}>
+                      {/* 유저 기본 정보 */}
+                      <div style={S.rowBetween}>
+                        <span style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{u.userName}</span>
+                        <span style={{ ...S.badge("#2563eb"), fontSize: 12 }}>총 {u.totalAssets?.toLocaleString()}원</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
+
+                      <div style={{ fontSize: 12, color: "#6b7280", margin: "8px 0" }}>
+                        <div>💰 예수금: <strong>{u.cash?.toLocaleString()}원</strong></div>
+                        <div style={{ marginTop: 4 }}>
+                          📦 보유주식:{" "}
+                          {u.holdings?.length === 0
+                            ? <span style={{ color: "#9ca3af" }}>없음</span>
+                            : u.holdings?.map((h, i) => (
+                              <span key={h.stockId}>
+                                {i > 0 && ", "}
+                                {h.stockName} ({h.quantity}주, 평단 {h.averagePrice?.toLocaleString()}원)
+                              </span>
+                            ))
+                          }
+                        </div>
+                      </div>
+
+                      {/* 예수금 조정 */}
+                      <div style={S.divider} />
+                      <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 700, marginBottom: 6 }}>예수금 조정 (양수=추가, 음수=차감)</div>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
                         <input
                           type="number"
-                          value={editPriceMap[s.id] || ""}
-                          onChange={(e) => setEditPriceMap({ ...editPriceMap, [s.id]: e.target.value })}
-                          className="w-16 px-1.5 py-1 border border-gray-200 rounded-md text-center text-xs font-semibold"
+                          placeholder="금액 입력"
+                          value={adjustCashMap[u.id] || ""}
+                          onChange={(e) => setAdjustCashMap({ ...adjustCashMap, [u.id]: e.target.value })}
+                          style={{ ...S.inputSm, flex: 1, minWidth: 100 }}
                         />
-                        <button
-                          onClick={() => handleUpdateStockPrice(s.id)}
-                          className="bg-gray-800 text-white px-2 py-1 rounded-md text-[10px] hover:bg-gray-700"
-                        >
-                          수정
+                        <button onClick={() => handleAdjustCash(u.id, u.userName)} style={{ ...S.btnPrimary, fontSize: 11, padding: "7px 12px", flexShrink: 0 }}>
+                          예수금 변경
                         </button>
-                        <button
-                          onClick={() => handleDeleteStock(s.id)}
-                          className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-2 py-1 rounded-md text-[10px] transition"
-                        >
-                          삭제
+                        <button onClick={() => handleDeleteUser(u.id, u.userName)} style={{ ...S.btnDanger, fontSize: 11, padding: "7px 12px", flexShrink: 0 }}>
+                          유저 삭제
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* 3. 속보 등록 카드 */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 space-y-4">
-            <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-3">📰 실시간 속보 발송</h3>
-            <form onSubmit={handleAddNews} className="space-y-3">
-              <div className="flex gap-2">
-                <div className="w-20">
-                  <label className="block text-[10px] text-gray-400 mb-1">노출 턴</label>
-                  <input
-                    type="number"
-                    value={newNewsTurn}
-                    onChange={(e) => setNewNewsTurn(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs text-center font-bold"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-[10px] text-gray-400 mb-1">속보 내용</label>
-                  <input
-                    type="text"
-                    value={newNewsContent}
-                    onChange={(e) => setNewNewsContent(e.target.value)}
-                    placeholder="예: OO전자 해외 수주 잭팟! 다음 턴 상승 예고"
-                    className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs"
-                  />
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-gray-900 text-white font-bold py-2 rounded-lg text-xs hover:bg-gray-800 transition"
-              >
-                속보 송출하기
-              </button>
-            </form>
-
-            {/* 송출 완료된 속보 리스트 */}
-            <div className="pt-2 max-h-36 overflow-y-auto space-y-1.5">
-              <span className="block text-[11px] font-semibold text-gray-400">송출된 속보 내역</span>
-              {news.length === 0 ? (
-                <p className="text-gray-400 text-xs text-center py-2">등록된 속보가 없습니다.</p>
-              ) : (
-                news.map((n) => (
-                  <div key={n.id} className="text-xs p-2 bg-gray-50 rounded-lg border border-gray-100 flex justify-between">
-                    <span className="text-gray-600 font-medium">[턴 {n.turnNo}] {n.content}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* 4. 유저 자산 현황 조회 (클릭 시에만 노출) */}
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-100 space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-              <h3 className="text-base font-bold text-gray-800">👥 유저 자산 정보</h3>
-              <button
-                onClick={fetchUsers}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition"
-              >
-                참가 유저 현황 조회
-              </button>
-            </div>
-
-            {showUsers && (
-              <div className="space-y-4">
-                {users.length === 0 ? (
-                  <p className="text-gray-400 text-xs text-center py-6">참가 중인 유저가 없습니다.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {users.map((u) => (
-                      <div key={u.id} className="p-3.5 bg-gray-50 rounded-xl border border-gray-100 text-xs space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="font-bold text-gray-800 text-sm">{u.userName}</span>
-                          <span className="font-bold text-blue-600">
-                            총 자산: {u.totalAssets.toLocaleString()}원
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-gray-500 space-y-1 pb-2">
-                          <div>예수금: {u.cash.toLocaleString()}원</div>
-                          <div>
-                            보유주식:{" "}
-                            {u.holdings.length === 0 ? (
-                              <span className="text-gray-400">없음</span>
-                            ) : (
-                              u.holdings.map((h, i) => (
-                                <span key={h.stockId}>
-                                  {i > 0 && ", "}
-                                  {h.stockName} ({h.quantity}주, 평단: {h.averagePrice.toLocaleString()}원)
-                                </span>
-                              ))
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 예수금 충전 및 삭제 조작 패널 */}
-                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 mt-2">
-                          <div className="flex items-center gap-1">
-                            <input
-                              type="number"
-                              placeholder="금액 (양수 추가, 음수 차감)"
-                              value={adjustCashMap[u.id] || ""}
-                              onChange={(e) => setAdjustCashMap({ ...adjustCashMap, [u.id]: e.target.value })}
-                              className="px-2 py-1 border border-gray-200 rounded-md text-xs w-28"
-                              style={{ padding: "4px 8px" }}
-                            />
-                            <button
-                              onClick={() => handleAdjustCash(u.id, u.userName)}
-                              className="bg-blue-600 text-white text-[10px] px-2.5 py-1.5 rounded-md hover:bg-blue-700 font-bold"
-                            >
-                              예수금 변경
-                            </button>
-                          </div>
-                          <button
-                            onClick={() => handleDeleteUser(u.id, u.userName)}
-                            className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white text-[10px] px-2.5 py-1.5 rounded-md font-bold transition"
-                          >
-                            유저 삭제
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              )
             )}
           </div>
+        </>
+      )}
 
+      {selectedGameId && !gameStatus && (
+        <div style={{ textAlign: "center", padding: 40, color: "#9ca3af", fontSize: 13 }}>
+          게임 정보를 불러오는 중...
+        </div>
+      )}
+
+      {!selectedGameId && (
+        <div style={{ textAlign: "center", padding: 40, color: "#9ca3af", fontSize: 13 }}>
+          위에서 관리할 게임을 선택해 주세요.
         </div>
       )}
     </div>

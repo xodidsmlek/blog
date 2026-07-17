@@ -412,22 +412,31 @@ app.put('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) => {
   try {
     const stockRef = firestore.collection('stocks').doc(stockId);
     const doc = await stockRef.get();
-    const gameId = doc.data().game || doc.data().game_id;
-    if (!doc.exists || gameId !== id) {
+
+    if (!doc.exists) {
       return res.status(404).json({ error: "주식 종목을 찾을 수 없습니다." });
+    }
+
+    const gameId = doc.data().game || doc.data().game_id;
+    if (gameId !== id) {
+      return res.status(403).json({ error: "이 게임에 속하지 않은 주식입니다." });
     }
 
     const updates = {};
     if (stockName) updates.stockName = stockName.trim();
-    if (price !== undefined) {
+    if (price !== undefined && price !== null && price !== "") {
       updates.prevPrice = doc.data().currentPrice;
       updates.currentPrice = Number(price);
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: "수정할 데이터가 없습니다." });
     }
 
     await stockRef.update(updates);
     res.json({ message: "주식 정보가 강제 변경되었습니다." });
   } catch (error) {
-    console.error(error);
+    console.error("Stock Update Error:", error);
     res.status(500).json({ error: "주식 정보 수정 실패" });
   }
 });
@@ -438,9 +447,14 @@ app.delete('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) =>
   try {
     const stockRef = firestore.collection('stocks').doc(stockId);
     const doc = await stockRef.get();
-    const gameId = doc.data().game || doc.data().game_id;
-    if (!doc.exists || gameId !== id) {
+
+    if (!doc.exists) {
       return res.status(404).json({ error: "주식을 찾을 수 없습니다." });
+    }
+
+    const gameId = doc.data().game || doc.data().game_id;
+    if (gameId !== id) {
+      return res.status(403).json({ error: "이 게임에 속하지 않은 주식입니다." });
     }
 
     const batch = firestore.batch();
@@ -454,7 +468,7 @@ app.delete('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) =>
     await batch.commit();
     res.json({ message: "주식이 성공적으로 삭제되었습니다." });
   } catch (error) {
-    console.error(error);
+    console.error("Stock Delete Error:", error);
     res.status(500).json({ error: "주식 삭제 실패" });
   }
 });

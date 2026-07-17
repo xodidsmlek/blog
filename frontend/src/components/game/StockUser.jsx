@@ -214,51 +214,44 @@ function StockUser() {
   };
 
   return (
-    <div className="stock-container max-w-md mx-auto p-4 space-y-6">
+    <div style={{ padding: "12px", maxWidth: "100%", boxSizing: "border-box", fontFamily: "sans-serif" }}>
       
       {/* 1. 게임방 대기 및 선택 헤더 */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-5 rounded-2xl shadow-lg space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="font-bold text-lg">📈 모바일 주식 거래소</span>
+      <div style={{ background: "linear-gradient(135deg, #2563eb, #4338ca)", color: "#fff", padding: "16px", borderRadius: 14, marginBottom: 14, boxShadow: "0 2px 10px rgba(37,99,235,.3)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <span style={{ fontWeight: 800, fontSize: 15 }}>📈 모바일 주식 거래소</span>
           {selectedGameId && (
             <button
               onClick={handleManualRefresh}
-              className="bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition"
+              style={{ background: "rgba(255,255,255,.2)", color: "#fff", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
             >
               🔄 시세 새로고침
             </button>
           )}
         </div>
-        
-        <div>
-          <label className="block text-[11px] font-semibold text-blue-200 mb-1">참여할 주식 게임방 선택</label>
-          <select
-            value={selectedGameId}
-            onChange={(e) => setSelectedGameId(e.target.value)}
-            className="w-full px-3 py-2 bg-white/10 text-white rounded-lg focus:outline-none border border-white/20 text-sm"
-          >
-            <option value="" className="text-gray-700">-- 주식게임방을 선택하세요 --</option>
-            {games.map((g) => (
-              <option key={g.id} value={g.id} className="text-gray-700">
-                {g.gameName}
-              </option>
-            ))}
-          </select>
-        </div>
+        <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.7)", marginBottom: 4, fontWeight: 600 }}>참여할 주식 게임방 선택</label>
+        <select
+          value={selectedGameId}
+          onChange={(e) => setSelectedGameId(e.target.value)}
+          style={{ width: "100%", boxSizing: "border-box", padding: "8px 12px", background: "rgba(255,255,255,.15)", color: "#fff", border: "1px solid rgba(255,255,255,.3)", borderRadius: 8, fontSize: 13, outline: "none" }}
+        >
+          <option value="" style={{ color: "#333" }}>-- 주식게임방을 선택하세요 --</option>
+          {games.map((g) => (
+            <option key={g.id} value={g.id} style={{ color: "#333" }}>{g.gameName}</option>
+          ))}
+        </select>
       </div>
 
-      {error && <div className="bg-red-50 text-red-600 text-xs p-3 rounded-lg border border-red-200">{error}</div>}
+      {error && <div style={{ background: "#fee2e2", color: "#dc2626", padding: "10px 14px", borderRadius: 10, fontSize: 12, marginBottom: 10 }}>{error}</div>}
 
       {selectedGameId && (
-        <div className="space-y-5">
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
           {/* 2. 장 정보 헤더 */}
           {gameStatus && (
-            <div className="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center text-xs">
-              <span className="font-bold text-gray-700">현재 {gameStatus.currentTurn}턴 진행중</span>
-              <span className={`font-semibold px-2.5 py-1 rounded-md ${
-                gameStatus.isLocked ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
-              }`}>
+            <div style={{ background: "#fff", borderRadius: 10, padding: "10px 14px", border: "1px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 }}>
+              <span style={{ fontWeight: 700, color: "#374151" }}>현재 {gameStatus.currentTurn}턴 진행중</span>
+              <span style={{ fontWeight: 700, padding: "4px 10px", borderRadius: 6, background: gameStatus.isLocked ? "#fee2e2" : "#dcfce7", color: gameStatus.isLocked ? "#dc2626" : "#15803d" }}>
                 {gameStatus.isLocked ? "장 마감 🚫" : "장 오픈 🟢"}
               </span>
             </div>
@@ -266,21 +259,21 @@ function StockUser() {
 
           {/* 3. 유저 로그인 / 참가 폼 */}
           {!userId ? (
-            <div className="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-4">
-              <h3 className="text-base font-bold text-gray-800">🎮 주식게임 참가</h3>
-              <p className="text-xs text-gray-400">참가할 유저명을 적고 입장하세요. 기본 1,000만 원 가상 예수금이 지급됩니다.</p>
-              <form onSubmit={handleJoinGame} className="flex gap-2">
+            <div style={{ background: "#fff", borderRadius: 14, padding: "16px", border: "1px solid #e5e7eb" }}>
+              <h3 style={{ fontWeight: 800, fontSize: 14, marginBottom: 6 }}>🎮 주식게임 참가</h3>
+              <p style={{ fontSize: 11, color: "#9ca3af", marginBottom: 10 }}>참가할 유저명을 적고 입장하세요. 기본 1,000만 원 가상 예수금이 지급됩니다.</p>
+              <form onSubmit={handleJoinGame} style={{ display: "flex", gap: 8 }}>
                 <input
                   type="text"
                   value={joinName}
                   onChange={(e) => setJoinName(e.target.value)}
                   placeholder="닉네임 입력 (예: 버핏짱)"
                   maxLength={10}
-                  className="flex-1 px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-1 focus:ring-blue-500"
+                  style={{ flex: 1, minWidth: 0, boxSizing: "border-box", padding: "8px 12px", border: "1px solid #e5e7eb", borderRadius: 10, fontSize: 13, outline: "none" }}
                 />
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition"
+                  style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}
                 >
                   가입/참가
                 </button>
@@ -289,59 +282,48 @@ function StockUser() {
           ) : (
             /* 4. 내 포트폴리오 카드 */
             portfolio && (
-              <div className="bg-white p-5 rounded-2xl shadow-md border border-gray-100 space-y-4">
-                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-400">참가 닉네임</span>
-                    <span className="font-bold text-gray-800 text-base">{userName}님</span>
+              <div style={{ background: "#fff", borderRadius: 14, padding: "16px", border: "1px solid #e5e7eb" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "1px solid #f3f4f6", paddingBottom: 10, marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 2 }}>참가 닉네임</div>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: "#111827" }}>{userName}님</div>
                   </div>
-                  <button
-                    onClick={handleLogout}
-                    className="text-[10px] text-gray-400 hover:text-red-500 underline"
-                  >
+                  <button onClick={handleLogout} style={{ fontSize: 11, color: "#9ca3af", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
                     로그아웃 (방 나가기)
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 p-3 rounded-xl">
-                    <span className="text-[10px] text-gray-400 block mb-0.5">총 평가 자산</span>
-                    <span className="font-bold text-gray-900 text-sm">
-                      {portfolio.totalAssets.toLocaleString()}원
-                    </span>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
+                  <div style={{ background: "#f9fafb", borderRadius: 10, padding: "10px 12px" }}>
+                    <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 2 }}>총 평가 자산</div>
+                    <div style={{ fontWeight: 800, fontSize: 13, color: "#111827" }}>{portfolio.totalAssets.toLocaleString()}원</div>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-xl">
-                    <span className="text-[10px] text-gray-400 block mb-0.5">보유 예수금</span>
-                    <span className="font-bold text-blue-600 text-sm">
-                      {portfolio.cash.toLocaleString()}원
-                    </span>
+                  <div style={{ background: "#eff6ff", borderRadius: 10, padding: "10px 12px" }}>
+                    <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 2 }}>보유 예수금</div>
+                    <div style={{ fontWeight: 800, fontSize: 13, color: "#2563eb" }}>{portfolio.cash.toLocaleString()}원</div>
                   </div>
                 </div>
 
                 {/* 보유 주식 리스트 */}
-                <div className="pt-2">
-                  <span className="block text-[11px] font-bold text-gray-400 mb-2">내가 가진 주식 현황</span>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af", marginBottom: 6 }}>내가 가진 주식 현황</div>
                   {portfolio.holdings.length === 0 ? (
-                    <p className="text-gray-400 text-xs py-2 text-center">보유 주식이 없습니다.</p>
+                    <p style={{ color: "#9ca3af", fontSize: 12, textAlign: "center", padding: "8px 0" }}>보유 주식이 없습니다.</p>
                   ) : (
-                    <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                    <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
                       {portfolio.holdings.map((h) => {
                         const returnPct = h.averagePrice > 0 ? Math.round(((h.currentPrice - h.averagePrice) / h.averagePrice) * 100) : 0;
                         return (
-                          <div key={h.stockId} className="flex justify-between items-center text-xs p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                          <div key={h.stockId} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#f9fafb", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}>
                             <div>
-                              <div className="font-bold text-gray-700">{h.stockName}</div>
-                              <div className="text-[10px] text-gray-400">
-                                {h.quantity}주 | 평단 {h.averagePrice.toLocaleString()}원
-                              </div>
+                              <div style={{ fontWeight: 700, color: "#374151" }}>{h.stockName}</div>
+                              <div style={{ fontSize: 10, color: "#9ca3af" }}>{h.quantity}주 | 평단 {h.averagePrice.toLocaleString()}원</div>
                             </div>
-                            <div className="text-right">
-                              <div className="font-bold text-gray-800">
-                                {h.evaluationAmount.toLocaleString()}원
-                              </div>
-                              <span className={`text-[10px] font-bold ${returnPct > 0 ? "text-red-500" : returnPct < 0 ? "text-blue-500" : "text-gray-400"}`}>
+                            <div style={{ textAlign: "right" }}>
+                              <div style={{ fontWeight: 700, color: "#111827" }}>{h.evaluationAmount.toLocaleString()}원</div>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: returnPct > 0 ? "#dc2626" : returnPct < 0 ? "#2563eb" : "#9ca3af" }}>
                                 {returnPct > 0 ? `+${returnPct}%` : `${returnPct}%`}
-                              </span>
+                              </div>
                             </div>
                           </div>
                         );
@@ -354,54 +336,50 @@ function StockUser() {
           )}
 
           {/* 5. 실시간 속보 뉴스 카드 */}
-          {news.length > 0 && (
-            <div className="bg-amber-50 border border-amber-100 p-4 rounded-xl shadow-sm text-xs space-y-2">
-              <span className="font-bold text-amber-800 flex items-center gap-1">🚨 [턴 {gameStatus?.currentTurn} 뉴스 속보]</span>
-              <div className="space-y-1.5 max-h-20 overflow-y-auto">
+          {news.filter((n) => n.turnNo === gameStatus?.currentTurn).length > 0 && (
+            <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 12, padding: "12px 14px" }}>
+              <div style={{ fontWeight: 800, fontSize: 12, color: "#92400e", marginBottom: 6 }}>🚨 [{gameStatus?.currentTurn}턴 뉴스 속보]</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 80, overflowY: "auto" }}>
                 {news.filter((n) => n.turnNo === gameStatus?.currentTurn).map((n) => (
-                  <p key={n.id} className="text-amber-900 font-semibold leading-relaxed">
-                    - {n.content}
-                  </p>
+                  <p key={n.id} style={{ fontSize: 12, color: "#78350f", fontWeight: 600, margin: 0 }}>- {n.content}</p>
                 ))}
               </div>
             </div>
           )}
 
           {/* 6. 주가 시세표 */}
-          <div className="bg-white p-4 rounded-2xl shadow-md border border-gray-100 space-y-3">
-            <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-2">📊 현재 주식 호가판</h3>
+          <div style={{ background: "#fff", borderRadius: 14, padding: "14px", border: "1px solid #e5e7eb" }}>
+            <h3 style={{ fontWeight: 800, fontSize: 14, color: "#111827", marginBottom: 10, paddingBottom: 8, borderBottom: "1px solid #f3f4f6" }}>📊 현재 주식 호가판</h3>
             {stocks.length === 0 ? (
-              <p className="text-gray-400 text-xs text-center py-6">상장된 종목이 아직 없습니다.</p>
+              <p style={{ color: "#9ca3af", fontSize: 12, textAlign: "center", padding: "24px 0" }}>상장된 종목이 아직 없습니다.</p>
             ) : (
-              <div className="space-y-2">
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {stocks.map((s) => {
                   const change = calculateChange(s.currentPrice, s.prevPrice);
                   return (
-                    <div key={s.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs gap-3">
-                      <div className="flex-1">
-                        <div className="font-bold text-gray-800 text-sm">{s.stockName}</div>
-                        <div className="text-[10px] text-gray-400">
-                          이전가: {s.prevPrice ? `${s.prevPrice.toLocaleString()}원` : "없음"}
+                    <div key={s.id} style={{ background: "#f9fafb", borderRadius: 10, border: "1px solid #e5e7eb", padding: "10px 12px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <div>
+                          <div style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{s.stockName}</div>
+                          <div style={{ fontSize: 10, color: "#9ca3af" }}>이전가: {s.prevPrice ? `${s.prevPrice.toLocaleString()}원` : "없음"}</div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{s.currentPrice.toLocaleString()}원</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: change.className.includes("red") ? "#dc2626" : change.className.includes("blue") ? "#2563eb" : "#9ca3af" }}>{change.text}</div>
                         </div>
                       </div>
-
-                      <div className="text-right">
-                        <div className="font-bold text-gray-900">{s.currentPrice.toLocaleString()}원</div>
-                        <div className={change.className}>{change.text}</div>
-                      </div>
-
-                      <div className="flex gap-1.5">
+                      <div style={{ display: "flex", gap: 8 }}>
                         <button
                           onClick={() => openTradeModal(s, "BUY")}
                           disabled={gameStatus?.isLocked}
-                          className="bg-red-500 text-white font-bold px-3 py-2 rounded-lg text-[10px] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                          style={{ flex: 1, background: gameStatus?.isLocked ? "#e5e7eb" : "#ef4444", color: gameStatus?.isLocked ? "#9ca3af" : "#fff", border: "none", borderRadius: 8, padding: "9px", fontSize: 13, fontWeight: 800, cursor: gameStatus?.isLocked ? "not-allowed" : "pointer" }}
                         >
                           매수
                         </button>
                         <button
                           onClick={() => openTradeModal(s, "SELL")}
                           disabled={gameStatus?.isLocked}
-                          className="bg-blue-600 text-white font-bold px-3 py-2 rounded-lg text-[10px] hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                          style={{ flex: 1, background: gameStatus?.isLocked ? "#e5e7eb" : "#2563eb", color: gameStatus?.isLocked ? "#9ca3af" : "#fff", border: "none", borderRadius: 8, padding: "9px", fontSize: 13, fontWeight: 800, cursor: gameStatus?.isLocked ? "not-allowed" : "pointer" }}
                         >
                           매도
                         </button>
@@ -418,64 +396,55 @@ function StockUser() {
 
       {/* 7. 거래 팝업 모달 */}
       {tradeModalOpen && selectedStock && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white max-w-sm w-full rounded-2xl p-5 shadow-2xl space-y-4">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-2">
-              <span className="font-bold text-base text-gray-800">
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 9999 }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: 20, width: "100%", maxWidth: 360, boxSizing: "border-box", boxShadow: "0 8px 32px rgba(0,0,0,.2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f3f4f6", paddingBottom: 10, marginBottom: 14 }}>
+              <span style={{ fontWeight: 800, fontSize: 15, color: "#111827" }}>
                 {selectedStock.stockName} {tradeType === "BUY" ? "매수" : "매도"}
               </span>
-              <button
-                onClick={() => setTradeModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-lg font-bold"
-              >
-                &times;
-              </button>
+              <button onClick={() => setTradeModalOpen(false)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#9ca3af" }}>×</button>
             </div>
 
-            <div className="text-xs space-y-1.5 bg-gray-50 p-3 rounded-xl border border-gray-100">
-              <div className="flex justify-between">
-                <span className="text-gray-400">현재가</span>
-                <span className="font-bold text-gray-800">{selectedStock.currentPrice.toLocaleString()}원</span>
+            <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 14px", marginBottom: 12, display: "flex", flexDirection: "column", gap: 6, fontSize: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#9ca3af" }}>현재가</span>
+                <span style={{ fontWeight: 700, color: "#111827" }}>{selectedStock.currentPrice.toLocaleString()}원</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">나의 예수금</span>
-                <span className="font-bold text-blue-600">{(portfolio?.cash || 0).toLocaleString()}원</span>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#9ca3af" }}>나의 예수금</span>
+                <span style={{ fontWeight: 700, color: "#2563eb" }}>{(portfolio?.cash || 0).toLocaleString()}원</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">보유량</span>
-                <span className="font-bold text-gray-800">
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#9ca3af" }}>보유량</span>
+                <span style={{ fontWeight: 700, color: "#111827" }}>
                   {portfolio?.holdings.find(h => h.stockId === selectedStock.id)?.quantity || 0}주
                 </span>
               </div>
             </div>
 
             {/* 수량 입력 */}
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-400 mb-1">주문 수량(주)</label>
+            <div style={{ marginBottom: 10 }}>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>주문 수량(주)</label>
               <input
                 type="number"
                 min="1"
                 value={tradeQty}
                 onChange={(e) => setTradeQty(Math.max(1, Number(e.target.value)))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-center font-bold focus:ring-1 focus:ring-blue-500"
+                style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", border: "1px solid #e5e7eb", borderRadius: 8, fontSize: 15, textAlign: "center", fontWeight: 800, outline: "none" }}
               />
             </div>
 
             {/* 예상 결제 금액 */}
-            <div className="flex justify-between items-center text-sm bg-gray-50 p-3 rounded-xl">
-              <span className="font-semibold text-gray-600">예상 결제 금액</span>
-              <span className={`font-bold ${tradeType === "BUY" ? "text-red-500" : "text-blue-600"}`}>
+            <div style={{ display: "flex", justifyContent: "space-between", background: "#f9fafb", borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 13 }}>
+              <span style={{ fontWeight: 600, color: "#6b7280" }}>예상 결제 금액</span>
+              <span style={{ fontWeight: 800, color: tradeType === "BUY" ? "#dc2626" : "#2563eb" }}>
                 {(selectedStock.currentPrice * tradeQty).toLocaleString()}원
               </span>
             </div>
 
             <button
               onClick={handleExecuteTrade}
-              className={`w-full font-bold py-2.5 rounded-xl text-sm text-white transition ${
-                tradeType === "BUY"
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
+              style={{ width: "100%", background: tradeType === "BUY" ? "#ef4444" : "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
             >
               {tradeType === "BUY" ? "매수하기" : "매도하기"}
             </button>

@@ -44,6 +44,7 @@ function StockAdmin() {
   const [newStockPrice, setNewStockPrice] = useState("");
   const [editPriceMap, setEditPriceMap]   = useState({});  // stockId → 수정가격(string)
   const [editNameMap, setEditNameMap]     = useState({});  // stockId → 수정종목명(string)
+  const [editRateMap, setEditRateMap]     = useState({});  // stockId → 수정변동률(string)
   const [expandedStockId, setExpandedStockId] = useState(null); // 수정 패널 열린 stockId
 
   const [newNewsTurn, setNewNewsTurn]     = useState("");
@@ -114,10 +115,17 @@ function StockAdmin() {
       if (stockRes.ok) {
         const d = await stockRes.json();
         setStocks(d);
-        const pm = {}, nm = {};
-        d.forEach((s) => { pm[s.id] = String(s.currentPrice); nm[s.id] = s.stockName; });
+        const pm = {}, nm = {}, rm = {};
+        d.forEach((s) => {
+          pm[s.id] = String(s.currentPrice);
+          nm[s.id] = s.stockName;
+          rm[s.id] = s.nextTurnChangeRate !== null && s.nextTurnChangeRate !== undefined
+            ? String(Math.round(s.nextTurnChangeRate * 100))
+            : "";
+        });
         setEditPriceMap(pm);
         setEditNameMap(nm);
+        setEditRateMap(rm);
       }
       if (newsRes.ok) {
         const d = await newsRes.json();
@@ -179,15 +187,22 @@ function StockAdmin() {
     } catch { alert("주식 추가 에러"); }
   };
 
-  // ── 주식 수정 (종목명 + 주가 동시) ──────────────────
+  // ── 주식 수정 (종목명 + 주가 + 변동률 동시) ──────────────────
   const handleUpdateStock = async (stockId) => {
     const newPrice = editPriceMap[stockId];
     const newName  = editNameMap[stockId];
+    const newRate  = editRateMap[stockId];
     if (newPrice === "" || newPrice === undefined) return alert("수정할 주가를 입력해 주세요.");
 
     const body = {};
     if (newName && newName.trim()) body.stockName = newName.trim();
     if (newPrice !== "") body.price = Number(newPrice);
+    
+    if (newRate === "" || newRate === undefined || newRate === null) {
+      body.nextTurnChangeRate = null;
+    } else {
+      body.nextTurnChangeRate = Number(newRate) / 100;
+    }
 
     try {
       const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks/${stockId}`, {
@@ -197,7 +212,7 @@ function StockAdmin() {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast("주가가 수정되었습니다.");
+        showToast("주식 정보가 수정되었습니다.");
         setExpandedStockId(null);
         fetchGameDetails();
       } else {
@@ -432,6 +447,11 @@ function StockAdmin() {
                                 ({priceDiff >= 0 ? "+" : ""}{priceDiff?.toLocaleString()}원)
                               </span>
                             )}
+                            {s.nextTurnChangeRate !== null && s.nextTurnChangeRate !== undefined && (
+                              <span style={{ fontSize: 10, background: "#fffbeb", color: "#b45309", border: "1px solid #fde68a", borderRadius: 4, padding: "1px 4px", fontWeight: 700 }}>
+                                다음 턴 지정: {s.nextTurnChangeRate >= 0 ? "+" : ""}{Math.round(s.nextTurnChangeRate * 100)}%
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
@@ -468,6 +488,16 @@ function StockAdmin() {
                               type="number"
                               value={editPriceMap[s.id] ?? s.currentPrice}
                               onChange={(e) => setEditPriceMap({ ...editPriceMap, [s.id]: e.target.value })}
+                              style={S.input}
+                            />
+                          </div>
+                          <div>
+                            <label style={S.label}>다음 턴 변동률 지정 (%, 예: 10 또는 -5. 미입력 시 랜덤)</label>
+                            <input
+                              type="number"
+                              value={editRateMap[s.id] ?? ""}
+                              onChange={(e) => setEditRateMap({ ...editRateMap, [s.id]: e.target.value })}
+                              placeholder="예: 10 (10% 상승), -5 (5% 하락)"
                               style={S.input}
                             />
                           </div>

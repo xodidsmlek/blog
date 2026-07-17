@@ -297,7 +297,15 @@ app.post('/api/games/:id/turn/next', checkFirestore, async (req, res) => {
       const data = doc.data();
       const curPrice = data.currentPrice;
 
-      const changePercent = (Math.random() * 0.2) - 0.05;
+      // 지정된 다음 턴 변동률이 있으면 사용하고 없으면 -5% ~ +5% 랜덤값 사용
+      const customRate = (data.nextTurnChangeRate !== undefined && data.nextTurnChangeRate !== null)
+        ? data.nextTurnChangeRate
+        : null;
+
+      const changePercent = customRate !== null
+        ? customRate
+        : ((Math.random() * 0.1) - 0.05);
+
       const newPrice = Math.max(1, Math.ceil(curPrice * (1 + changePercent)));
 
       stockMap[doc.id] = {
@@ -309,7 +317,8 @@ app.post('/api/games/:id/turn/next', checkFirestore, async (req, res) => {
 
       dbBatch.update(doc.ref, {
         prevPrice: curPrice,
-        currentPrice: newPrice
+        currentPrice: newPrice,
+        nextTurnChangeRate: null // 변동이 반영되었으므로 다시 null로 리셋
       });
     });
 
@@ -407,7 +416,7 @@ app.post('/api/games/:id/stocks', checkFirestore, async (req, res) => {
 // 11. 주식 정보 수정 (매니저 - 수동 조작)
 app.put('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) => {
   const { id, stockId } = req.params;
-  const { stockName, price } = req.body;
+  const { stockName, price, nextTurnChangeRate } = req.body;
 
   try {
     const stockRef = firestore.collection('stocks').doc(stockId);
@@ -427,6 +436,11 @@ app.put('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) => {
     if (price !== undefined && price !== null && price !== "") {
       updates.prevPrice = doc.data().currentPrice;
       updates.currentPrice = Number(price);
+    }
+    if (nextTurnChangeRate !== undefined) {
+      updates.nextTurnChangeRate = (nextTurnChangeRate === null || nextTurnChangeRate === "")
+        ? null
+        : Number(nextTurnChangeRate);
     }
 
     if (Object.keys(updates).length === 0) {

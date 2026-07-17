@@ -23,7 +23,7 @@ function StockUser() {
   const [tradeModalOpen, setTradeModalOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState(null);
   const [tradeType, setTradeType] = useState("BUY"); // BUY or SELL
-  const [tradeQty, setTradeQty] = useState(1);
+  const [tradeQty, setTradeQty] = useState("");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -162,7 +162,8 @@ function StockUser() {
 
   // 거래 실행 (매수/매도)
   const handleExecuteTrade = async () => {
-    if (tradeQty <= 0) return alert("거래할 수량을 1주 이상 입력해 주세요.");
+    const qty = Number(tradeQty);
+    if (!qty || qty <= 0) return alert("거래할 수량을 1주 이상 입력해 주세요.");
     try {
       const res = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/trade`, {
         method: "POST",
@@ -171,7 +172,7 @@ function StockUser() {
           userId: userId,
           stockId: selectedStock.id,
           type: tradeType,
-          quantity: Number(tradeQty)
+          quantity: qty
         })
       });
       const data = await res.json();
@@ -199,7 +200,7 @@ function StockUser() {
     }
     setSelectedStock(stock);
     setTradeType(type);
-    setTradeQty(1);
+    setTradeQty("");
     setTradeModalOpen(true);
   };
 
@@ -283,14 +284,9 @@ function StockUser() {
             /* 4. 내 포트폴리오 카드 */
             portfolio && (
               <div style={{ background: "#fff", borderRadius: 14, padding: "16px", border: "1px solid #e5e7eb" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "1px solid #f3f4f6", paddingBottom: 10, marginBottom: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 2 }}>참가 닉네임</div>
-                    <div style={{ fontWeight: 800, fontSize: 15, color: "#111827" }}>{userName}님</div>
-                  </div>
-                  <button onClick={handleLogout} style={{ fontSize: 11, color: "#9ca3af", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
-                    로그아웃 (방 나가기)
-                  </button>
+                <div style={{ borderBottom: "1px solid #f3f4f6", paddingBottom: 10, marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 2 }}>참가 닉네임</div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: "#111827" }}>{userName}님</div>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
@@ -423,31 +419,54 @@ function StockUser() {
             </div>
 
             {/* 수량 입력 */}
-            <div style={{ marginBottom: 10 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>주문 수량(주)</label>
-              <input
-                type="number"
-                min="1"
-                value={tradeQty}
-                onChange={(e) => setTradeQty(Math.max(1, Number(e.target.value)))}
-                style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", border: "1px solid #e5e7eb", borderRadius: 8, fontSize: 15, textAlign: "center", fontWeight: 800, outline: "none" }}
-              />
-            </div>
+            {(() => {
+              const holdingQty = portfolio?.holdings.find(h => h.stockId === selectedStock.id)?.quantity || 0;
+              const maxBuy = selectedStock.currentPrice > 0 ? Math.floor((portfolio?.cash || 0) / selectedStock.currentPrice) : 0;
+              const maxQty = tradeType === "BUY" ? maxBuy : holdingQty;
+              const parsedQty = Number(tradeQty) || 0;
+              return (
+                <>
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>주문 수량(주)</label>
+                      <span style={{ fontSize: 11, color: "#6b7280" }}>최대 <strong style={{ color: tradeType === "BUY" ? "#dc2626" : "#2563eb" }}>{maxQty.toLocaleString()}주</strong></span>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input
+                        type="number"
+                        min="1"
+                        max={maxQty}
+                        value={tradeQty}
+                        onChange={(e) => setTradeQty(e.target.value)}
+                        placeholder="수량 입력"
+                        style={{ flex: 1, boxSizing: "border-box", padding: "9px 12px", border: "1px solid #e5e7eb", borderRadius: 8, fontSize: 15, textAlign: "center", fontWeight: 800, outline: "none" }}
+                      />
+                      <button
+                        onClick={() => setTradeQty(String(maxQty))}
+                        style={{ background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 8, padding: "8px 14px", fontSize: 12, fontWeight: 700, color: "#374151", cursor: "pointer", flexShrink: 0 }}
+                      >
+                        최대
+                      </button>
+                    </div>
+                  </div>
 
-            {/* 예상 결제 금액 */}
-            <div style={{ display: "flex", justifyContent: "space-between", background: "#f9fafb", borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 13 }}>
-              <span style={{ fontWeight: 600, color: "#6b7280" }}>예상 결제 금액</span>
-              <span style={{ fontWeight: 800, color: tradeType === "BUY" ? "#dc2626" : "#2563eb" }}>
-                {(selectedStock.currentPrice * tradeQty).toLocaleString()}원
-              </span>
-            </div>
-
-            <button
-              onClick={handleExecuteTrade}
-              style={{ width: "100%", background: tradeType === "BUY" ? "#ef4444" : "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
-            >
-              {tradeType === "BUY" ? "매수하기" : "매도하기"}
-            </button>
+                  {/* 예상 결제 금액 */}
+                  <div style={{ display: "flex", justifyContent: "space-between", background: "#f9fafb", borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 13 }}>
+                    <span style={{ fontWeight: 600, color: "#6b7280" }}>예상 결제 금액</span>
+                    <span style={{ fontWeight: 800, color: tradeType === "BUY" ? "#dc2626" : "#2563eb" }}>
+                      {(selectedStock.currentPrice * parsedQty).toLocaleString()}원
+                    </span>
+                  </div>
+                  {/* 매수/매도 버튼 */}
+                  <button
+                    onClick={handleExecuteTrade}
+                    style={{ width: "100%", background: tradeType === "BUY" ? "#ef4444" : "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 800, cursor: "pointer" }}
+                  >
+                    {tradeType === "BUY" ? "매수하기" : "매도하기"}
+                  </button>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

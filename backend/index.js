@@ -9,7 +9,7 @@ app.use(express.json());           // ⭐ 필수
 app.use(express.urlencoded({ extended: true })); // 선
 app.use(cors({
   origin: ['https://xodidsmlek.github.io','http://localhost:5173'],
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true
 }));
 

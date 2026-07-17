@@ -297,14 +297,14 @@ app.post('/api/games/:id/turn/next', checkFirestore, async (req, res) => {
       const data = doc.data();
       const curPrice = data.currentPrice;
 
-      // 지정된 다음 턴 변동률이 있으면 사용하고 없으면 -5% ~ +5% 랜덤값 사용
+      // 지정된 다음 턴 변동률이 있으면 사용하고 없으면 -5% ~ +15% 랜덤값 사용
       const customRate = (data.nextTurnChangeRate !== undefined && data.nextTurnChangeRate !== null)
         ? data.nextTurnChangeRate
         : null;
 
       const changePercent = customRate !== null
         ? customRate
-        : ((Math.random() * 0.1) - 0.05);
+        : ((Math.random() * 0.2) - 0.05);
 
       const newPrice = Math.max(1, Math.ceil(curPrice * (1 + changePercent)));
 

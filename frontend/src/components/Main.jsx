@@ -4,6 +4,9 @@ import TeamUpdate from "./game/TeamUpdate";
 import FourWord from "./game/FourWord";
 import AbsolutePitch from "./game/AbsolutePitch";
 import Picture from "./game/Picture";
+import StockGameManager from "./game/StockGameManager";
+import StockAdmin from "./game/StockAdmin";
+import StockUser from "./game/StockUser";
 
 function Main({ menu }) {
   switch (menu) {
@@ -17,6 +20,12 @@ function Main({ menu }) {
       return <AbsolutePitch />;
     case "picture":
       return <Picture />;
+    case "stockGameManager":
+      return <StockGameManager />;
+    case "stockAdmin":
+      return <StockAdmin />;
+    case "stockUser":
+      return <StockUser />;
     default:
       return null;
   }

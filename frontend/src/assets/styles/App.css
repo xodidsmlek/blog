@@ -206,3 +206,305 @@
 .btn:active {
   transform: translateY(0);
 }
+
+/* ==========================================
+   TURN-BASED STOCK GAME CUSTOM CSS
+   ========================================== */
+
+/* 모바일 퍼스트 뷰포트 제한 & 중앙 정렬 (반응형) */
+.stock-container {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #333333;
+}
+
+.stock-pw-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* 카드 및 공통 요소 스타일링 */
+.stock-container .bg-white,
+.stock-pw-screen .bg-white {
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
+.stock-container .bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.stock-container .bg-gray-800 {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+
+.stock-container .bg-amber-50 {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+  color: #78350f;
+}
+
+.stock-container .bg-gradient-to-r {
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  color: #ffffff;
+}
+
+/* 그림자 & 테두리 */
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
+.border {
+  border: 1px solid #e5e7eb;
+}
+
+.border-gray-100 {
+  border-color: #f3f4f6;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb;
+}
+
+.border-amber-200 {
+  border-color: #fde68a;
+}
+
+/* 간격 & 정렬 */
+.space-y-6 > * + * { margin-top: 1.5rem; }
+.space-y-5 > * + * { margin-top: 1.25rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-1\.5 > * + * { margin-top: 0.375rem; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.flex-1 { flex: 1 1 0%; }
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gap-4 { gap: 1rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-1\.5 { gap: 0.375rem; }
+
+/* 텍스트 크기 & 두께 */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+
+.text-2xl { font-size: 1.5rem; }
+.text-lg { font-size: 1.125rem; }
+.text-base { font-size: 1rem; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.text-\[11px\] { font-size: 11px; }
+.text-\[10px\] { font-size: 10px; }
+
+/* 텍스트 색상 */
+.text-gray-800 { color: #1f2937; }
+.text-gray-700 { color: #374151; }
+.text-gray-600 { color: #4b5563; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-400 { color: #9ca3af; }
+.text-blue-600 { color: #2563eb; }
+.text-blue-200 { color: #bfdbfe; }
+.text-red-500 { color: #ef4444; }
+.text-blue-500 { color: #3b82f6; }
+.text-green-700 { color: #047857; }
+.text-red-700 { color: #b91c1c; }
+.text-amber-800 { color: #92400e; }
+.text-amber-700 { color: #b45309; }
+.text-amber-900 { color: #78350f; }
+
+/* 버튼 & 입력 필드 스타일 */
+.stock-container select,
+.stock-container input,
+.stock-pw-screen input {
+  padding: 8px 12px;
+  background-color: #ffffff;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stock-container select:focus,
+.stock-container input:focus,
+.stock-pw-screen input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.stock-container button,
+.stock-pw-screen button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* 버튼 컬러 클래스들 */
+.bg-blue-600 {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+.bg-blue-600:hover {
+  background-color: #1d4ed8;
+}
+
+.bg-red-500 {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+.bg-red-500:hover {
+  background-color: #dc2626;
+}
+
+.bg-red-600 {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+.bg-red-600:hover {
+  background-color: #b91c1c;
+}
+
+.bg-gray-800 {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+.bg-gray-800:hover {
+  background-color: #111827;
+}
+
+.bg-gray-200 {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+.bg-gray-200:hover {
+  background-color: #d1d5db;
+}
+
+.bg-green-100 {
+  background-color: #d1fae5;
+}
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+
+.bg-blue-100 {
+  background-color: #dbeafe;
+}
+
+.bg-red-550 {
+  background-color: #e11d48;
+}
+
+/* 모달 오버레이 */
+.fixed.inset-0.bg-black\/50 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.max-w-sm {
+  max-width: 384px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.max-w-md {
+  max-width: 480px;
+}
+
+.max-w-sm.w-full.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.w-16 { width: 64px; }
+.w-20 { width: 80px; }
+.w-24 { width: 96px; }
+
+/* 패딩/마진 세부조정 */
+.p-6 { padding: 1.5rem; }
+.p-5 { padding: 1.25rem; }
+.p-4 { padding: 1rem; }
+.p-3 { padding: 0.75rem; }
+.p-3\.5 { padding: 0.875rem; }
+.p-2\.5 { padding: 0.625rem; }
+.p-2 { padding: 0.5rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+.px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+.py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+.pb-3 { padding-bottom: 0.75rem; }
+.pb-2 { padding-bottom: 0.5rem; }
+.pt-2 { padding-top: 0.5rem; }
+.pt-3 { padding-top: 0.75rem; }
+
+.mt-12 { margin-top: 3rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-1\.5 { margin-bottom: 0.375rem; }
+.mt-2 { margin-top: 0.5rem; }
+
+.underline { text-decoration: underline; }
+.max-h-36 { max-height: 9rem; }
+.max-h-40 { max-height: 10rem; }
+.max-h-20 { max-height: 5rem; }
+.overflow-y-auto { overflow-y: auto; }

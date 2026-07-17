@@ -33,6 +33,13 @@ function App() {
           <div className={`side_menu ${selectedPost === 'fourWord' ? 'active' : ''}`} onClick={() => { setSelectedPost('fourWord'); setOnSidebar(''); }}>4글자 게임</div>
           <div className={`side_menu ${selectedPost === 'absolutePitch' ? 'active' : ''}`} onClick={() => { setSelectedPost('absolutePitch'); setOnSidebar(''); }}>절대음감 / 청개구리 절대음감</div>
           <div className={`side_menu ${selectedPost === 'picture' ? 'active' : ''}`} onClick={() => { setSelectedPost('picture'); setOnSidebar(''); }}>이구동성 그림그리기</div>
+          
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.15)", margin: "12px 0" }}></div>
+          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", padding: "0 16px 6px 16px", textTransform: "uppercase", fontWeight: "bold", letterSpacing: "0.5px" }}>주식 게임</div>
+          
+          <div className={`side_menu ${selectedPost === 'stockUser' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockUser'); setOnSidebar(''); }}>📈 주식게임 유저 화면</div>
+          <div className={`side_menu ${selectedPost === 'stockAdmin' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockAdmin'); setOnSidebar(''); }}>👑 주식게임 매니저 화면</div>
+          <div className={`side_menu ${selectedPost === 'stockGameManager' ? 'active' : ''}`} onClick={() => { setSelectedPost('stockGameManager'); setOnSidebar(''); }}>⚙️ 게임 마스터 (게임관리)</div>
         </div>
       </aside>
 

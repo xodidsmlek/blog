@@ -297,7 +297,7 @@ app.post('/api/games/:id/turn/next', checkFirestore, async (req, res) => {
       const data = doc.data();
       const curPrice = data.currentPrice;
 
-      const changePercent = (Math.random() * 0.1) - 0.05;
+      const changePercent = (Math.random() * 0.2) - 0.05;
       const newPrice = Math.max(1, Math.ceil(curPrice * (1 + changePercent)));
 
       stockMap[doc.id] = {
@@ -840,4 +840,4 @@ app.delete('/api/games/:id/users/:userId', checkFirestore, async (req, res) => {
 
 app.listen(4000, () => {
   console.log('✅ Server running on http://localhost:4000');
-});
+});

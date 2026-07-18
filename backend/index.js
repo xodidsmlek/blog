@@ -434,8 +434,11 @@ app.put('/api/games/:id/stocks/:stockId', checkFirestore, async (req, res) => {
     const updates = {};
     if (stockName) updates.stockName = stockName.trim();
     if (price !== undefined && price !== null && price !== "") {
-      updates.prevPrice = doc.data().currentPrice;
-      updates.currentPrice = Number(price);
+      const newPrice = Number(price);
+      if (newPrice !== doc.data().currentPrice) {
+        updates.prevPrice = doc.data().currentPrice;
+        updates.currentPrice = newPrice;
+      }
     }
     if (nextTurnChangeRate !== undefined) {
       updates.nextTurnChangeRate = (nextTurnChangeRate === null || nextTurnChangeRate === "")

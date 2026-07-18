@@ -494,13 +494,35 @@ function StockAdmin() {
                           </div>
                           <div>
                             <label style={S.label}>다음 턴 변동률 지정 (%, 예: 10 또는 -5. 미입력 시 랜덤)</label>
-                            <input
-                              type="number"
-                              value={editRateMap[s.id] ?? ""}
-                              onChange={(e) => setEditRateMap({ ...editRateMap, [s.id]: e.target.value })}
-                              placeholder="예: 10 (10% 상승), -5 (5% 하락)"
-                              style={S.input}
-                            />
+                            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                              <input
+                                type="number"
+                                value={editRateMap[s.id] ?? ""}
+                                onChange={(e) => setEditRateMap({ ...editRateMap, [s.id]: e.target.value })}
+                                placeholder="예: 10 (10% 상승), -5 (5% 하락)"
+                                style={{ ...S.input, flex: 1 }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const val = Math.floor(Math.random() * 15) + 1; // 1% ~ 15% 랜덤값
+                                  setEditRateMap({ ...editRateMap, [s.id]: String(val) });
+                                }}
+                                style={{ ...S.btnSuccess, background: "#fee2e2", color: "#dc2626", flexShrink: 0, padding: "8px 10px", fontSize: 11 }}
+                              >
+                                ▲ UP (1~15%)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const val = -(Math.floor(Math.random() * 5) + 1); // -1% ~ -5% 랜덤값
+                                  setEditRateMap({ ...editRateMap, [s.id]: String(val) });
+                                }}
+                                style={{ ...S.btnPrimary, background: "#eff6ff", color: "#2563eb", flexShrink: 0, padding: "8px 10px", fontSize: 11 }}
+                              >
+                                ▼ DOWN (-1~-5%)
+                              </button>
+                            </div>
                           </div>
                           <button
                             onClick={() => handleUpdateStock(s.id)}

@@ -221,6 +221,31 @@ function StockAdmin() {
     } catch { alert("주식 수정 에러"); }
   };
 
+  // ── 주식 변동률 UP/DOWN 즉시 설정 ──────────────────
+  const handleQuickRate = async (stockId, type) => {
+    let val = 0;
+    if (type === "UP") {
+      val = Math.floor(Math.random() * 15) + 1; // 1% ~ 15% 랜덤값
+    } else {
+      val = -(Math.floor(Math.random() * 5) + 1); // -1% ~ -5% 랜덤값
+    }
+
+    try {
+      const res  = await fetch(`${API_BASE_URL}/api/games/${selectedGameId}/stocks/${stockId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nextTurnChangeRate: val / 100 }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`${type === "UP" ? "▲ UP" : "▼ DOWN"} 지정 완료: ${val >= 0 ? "+" : ""}${val}%`);
+        fetchGameDetails();
+      } else {
+        alert(data.error || "지정 실패");
+      }
+    } catch { alert("변동률 지정 에러"); }
+  };
+
   // ── 주식 삭제 ────────────────────────────────────
   const handleDeleteStock = async (stockId, stockName) => {
     if (!window.confirm(`정말 [${stockName}] 종목을 삭제하시겠습니까?\n유저가 보유한 해당 주식 데이터도 모두 파기됩니다.`)) return;
@@ -504,20 +529,14 @@ function StockAdmin() {
                               />
                               <button
                                 type="button"
-                                onClick={() => {
-                                  const val = Math.floor(Math.random() * 15) + 1; // 1% ~ 15% 랜덤값
-                                  setEditRateMap({ ...editRateMap, [s.id]: String(val) });
-                                }}
+                                onClick={() => handleQuickRate(s.id, "UP")}
                                 style={{ ...S.btnSuccess, background: "#fee2e2", color: "#dc2626", flexShrink: 0, padding: "8px 10px", fontSize: 11 }}
                               >
                                 ▲ UP (1~15%)
                               </button>
                               <button
                                 type="button"
-                                onClick={() => {
-                                  const val = -(Math.floor(Math.random() * 5) + 1); // -1% ~ -5% 랜덤값
-                                  setEditRateMap({ ...editRateMap, [s.id]: String(val) });
-                                }}
+                                onClick={() => handleQuickRate(s.id, "DOWN")}
                                 style={{ ...S.btnPrimary, background: "#eff6ff", color: "#2563eb", flexShrink: 0, padding: "8px 10px", fontSize: 11 }}
                               >
                                 ▼ DOWN (-1~-5%)

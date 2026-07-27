@@ -262,7 +262,7 @@ function StockUser() {
           {!userId ? (
             <div style={{ background: "#fff", borderRadius: 14, padding: "16px", border: "1px solid #e5e7eb" }}>
               <h3 style={{ fontWeight: 800, fontSize: 14, marginBottom: 6 }}>🎮 주식게임 참가</h3>
-              <p style={{ fontSize: 11, color: "#9ca3af", marginBottom: 10 }}>참가할 유저명을 적고 입장하세요. 기본 1,000만 원 가상 예수금이 지급됩니다.</p>
+              <p style={{ fontSize: 11, color: "#9ca3af", marginBottom: 10 }}>참가할 유저명을 적고 입장하세요. 기본 1,000만 달란트 가상 예수금이 지급됩니다.</p>
               <form onSubmit={handleJoinGame} style={{ display: "flex", gap: 8 }}>
                 <input
                   type="text"
@@ -292,11 +292,11 @@ function StockUser() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
                   <div style={{ background: "#f9fafb", borderRadius: 10, padding: "10px 12px" }}>
                     <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 2 }}>총 평가 자산</div>
-                    <div style={{ fontWeight: 800, fontSize: 13, color: "#111827" }}>{portfolio.totalAssets.toLocaleString()}원</div>
+                    <div style={{ fontWeight: 800, fontSize: 13, color: "#111827" }}>{portfolio.totalAssets.toLocaleString()}달란트</div>
                   </div>
                   <div style={{ background: "#eff6ff", borderRadius: 10, padding: "10px 12px" }}>
-                    <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 2 }}>보유 예수금</div>
-                    <div style={{ fontWeight: 800, fontSize: 13, color: "#2563eb" }}>{portfolio.cash.toLocaleString()}원</div>
+                    <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 2 }}>보유 달란트</div>
+                    <div style={{ fontWeight: 800, fontSize: 13, color: "#2563eb" }}>{portfolio.cash.toLocaleString()}달란트</div>
                   </div>
                 </div>
 
@@ -313,10 +313,10 @@ function StockUser() {
                           <div key={h.stockId} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#f9fafb", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12 }}>
                             <div>
                               <div style={{ fontWeight: 700, color: "#374151" }}>{h.stockName}</div>
-                              <div style={{ fontSize: 10, color: "#9ca3af" }}>{h.quantity}주 | 평단 {h.averagePrice.toLocaleString()}원</div>
+                              <div style={{ fontSize: 10, color: "#9ca3af" }}>{h.quantity}주 | 평단 {h.averagePrice.toLocaleString()}달란트</div>
                             </div>
                             <div style={{ textAlign: "right" }}>
-                              <div style={{ fontWeight: 700, color: "#111827" }}>{h.evaluationAmount.toLocaleString()}원</div>
+                              <div style={{ fontWeight: 700, color: "#111827" }}>{h.evaluationAmount.toLocaleString()}달란트</div>
                               <div style={{ fontSize: 10, fontWeight: 700, color: returnPct > 0 ? "#dc2626" : returnPct < 0 ? "#2563eb" : "#9ca3af" }}>
                                 {returnPct > 0 ? `+${returnPct}%` : `${returnPct}%`}
                               </div>
@@ -357,10 +357,10 @@ function StockUser() {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                         <div>
                           <div style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{s.stockName}</div>
-                          <div style={{ fontSize: 10, color: "#9ca3af" }}>이전가: {s.prevPrice ? `${s.prevPrice.toLocaleString()}원` : "없음"}</div>
+                          <div style={{ fontSize: 10, color: "#9ca3af" }}>이전가: {s.prevPrice ? `${s.prevPrice.toLocaleString()}달란트` : "없음"}</div>
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <div style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{s.currentPrice.toLocaleString()}원</div>
+                          <div style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{s.currentPrice.toLocaleString()}달란트</div>
                           <div style={{ fontSize: 11, fontWeight: 700, color: change.className.includes("red") ? "#dc2626" : change.className.includes("blue") ? "#2563eb" : "#9ca3af" }}>{change.text}</div>
                         </div>
                       </div>
@@ -404,11 +404,11 @@ function StockUser() {
             <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 14px", marginBottom: 12, display: "flex", flexDirection: "column", gap: 6, fontSize: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#9ca3af" }}>현재가</span>
-                <span style={{ fontWeight: 700, color: "#111827" }}>{selectedStock.currentPrice.toLocaleString()}원</span>
+                <span style={{ fontWeight: 700, color: "#111827" }}>{selectedStock.currentPrice.toLocaleString()}달란트</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "#9ca3af" }}>나의 예수금</span>
-                <span style={{ fontWeight: 700, color: "#2563eb" }}>{(portfolio?.cash || 0).toLocaleString()}원</span>
+                <span style={{ color: "#9ca3af" }}>나의 달란트</span>
+                <span style={{ fontWeight: 700, color: "#2563eb" }}>{(portfolio?.cash || 0).toLocaleString()}달란트</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#9ca3af" }}>보유량</span>
@@ -454,7 +454,7 @@ function StockUser() {
                   <div style={{ display: "flex", justifyContent: "space-between", background: "#f9fafb", borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 13 }}>
                     <span style={{ fontWeight: 600, color: "#6b7280" }}>예상 결제 금액</span>
                     <span style={{ fontWeight: 800, color: tradeType === "BUY" ? "#dc2626" : "#2563eb" }}>
-                      {(selectedStock.currentPrice * parsedQty).toLocaleString()}원
+                      {(selectedStock.currentPrice * parsedQty).toLocaleString()}달란트
                     </span>
                   </div>
                   {/* 매수/매도 버튼 */}

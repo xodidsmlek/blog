@@ -294,7 +294,7 @@ function StockAdmin() {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast(`${uName}님 예수금 변경 완료 (${Number(amount) >= 0 ? "+" : ""}${Number(amount).toLocaleString()}원)`);
+        showToast(`${uName}님 예수금 변경 완료 (${Number(amount) >= 0 ? "+" : ""}${Number(amount).toLocaleString()}달란트)`);
         setAdjustCashMap({ ...adjustCashMap, [userId]: "" });
         fetchUsers();
       } else alert(data.error);
@@ -433,7 +433,7 @@ function StockAdmin() {
                   />
                 </div>
                 <div>
-                  <label style={S.label}>주가(원)</label>
+                  <label style={S.label}>주가(달란트)</label>
                   <input
                     type="number"
                     value={newStockPrice}
@@ -467,7 +467,7 @@ function StockAdmin() {
                             {s.stockName}
                           </div>
                           <div style={{ ...S.row, gap: 6, flexWrap: "wrap" }}>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: "#1f2937" }}>{s.currentPrice?.toLocaleString()}원</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "#1f2937" }}>{s.currentPrice?.toLocaleString()}달란트</span>
                             {roundedPct !== null && (
                               <span style={{ fontSize: 11, color: roundedPct >= 0 ? "#dc2626" : "#2563eb", fontWeight: 700 }}>
                                 ({roundedPct >= 0 ? "+" : ""}{roundedPct}%)
@@ -509,7 +509,7 @@ function StockAdmin() {
                             />
                           </div>
                           <div>
-                            <label style={S.label}>주가 강제 변경 (원)</label>
+                            <label style={S.label}>주가 강제 변경 (달란트)</label>
                             <input
                               type="number"
                               value={editPriceMap[s.id] ?? s.currentPrice}
@@ -624,11 +624,11 @@ function StockAdmin() {
                       {/* 유저 기본 정보 */}
                       <div style={S.rowBetween}>
                         <span style={{ fontWeight: 800, fontSize: 14, color: "#111827" }}>{u.userName}</span>
-                        <span style={{ ...S.badge("#2563eb"), fontSize: 12 }}>총 {u.totalAssets?.toLocaleString()}원</span>
+                        <span style={{ ...S.badge("#2563eb"), fontSize: 12 }}>총 {u.totalAssets?.toLocaleString()}달란트</span>
                       </div>
 
                       <div style={{ fontSize: 12, color: "#6b7280", margin: "8px 0" }}>
-                        <div>💰 예수금: <strong>{u.cash?.toLocaleString()}원</strong></div>
+                        <div>💰 예수금: <strong>{u.cash?.toLocaleString()}달란트</strong></div>
                         <div style={{ marginTop: 4 }}>
                           📦 보유주식:{" "}
                           {u.holdings?.length === 0
@@ -636,7 +636,7 @@ function StockAdmin() {
                             : u.holdings?.map((h, i) => (
                               <span key={h.stockId}>
                                 {i > 0 && ", "}
-                                {h.stockName} ({h.quantity}주, 평단 {h.averagePrice?.toLocaleString()}원)
+                                {h.stockName} ({h.quantity}주, 평단 {h.averagePrice?.toLocaleString()}달란트)
                               </span>
                             ))
                           }
